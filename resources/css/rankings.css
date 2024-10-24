@@ -1,0 +1,20 @@
+.good{
+    color: #19AF54;
+    border-color: #19AF54;
+}
+.moderate{
+    color: #CFEA2A;
+    border-color: #CFEA2A;
+}
+.poor{
+    color: #EEB530;
+    border-color: #EEB530;
+}
+.severe{
+    color: #FD2525;
+    border-color: #FD2525;
+}
+.hazardous{
+    color: #B10007;
+    border-color: #B10007;
+}

@@ -1,0 +1,47 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "@inertiajs/vue3": "^1.0.0",
+        "@tailwindcss/forms": "^0.5.7",
+        "@tailwindcss/typography": "^0.5.13",
+        "@vitejs/plugin-vue": "^4.5.0",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.2",
+        "laravel-vite-plugin": "^1.0.0",
+        "postcss": "^8.4.47",
+        "tailwindcss": "^3.4.13",
+        "vite": "^5.4.8",
+        "vite-plugin-vue-devtools": "^7.4.6",
+        "vue": "^3.5.12"
+    },
+    "dependencies": {
+        "@vee-validate/yup": "^4.14.3",
+        "@vue-leaflet/vue-leaflet": "^0.10.1",
+        "@vueuse/core": "^11.1.0",
+        "chart.js": "^4.4.3",
+        "class-variance-authority": "^0.7.0",
+        "clsx": "^2.1.1",
+        "date-fns": "^3.6.0",
+        "firebase": "^10.14.0",
+        "flatpickr": "^4.6.13",
+        "js-cookie": "^3.0.5",
+        "leaflet": "^1.9.4",
+        "lodash": "^4.17.21",
+        "lucide-vue-next": "^0.452.0",
+        "moment": "^2.30.1",
+        "pinia": "^2.2.4",
+        "radix-vue": "^1.9.7",
+        "tailwind-merge": "^2.5.3",
+        "tailwindcss-animate": "^1.0.7",
+        "vee-validate": "^4.14.3",
+        "vue-i18n": "^9.13.1",
+        "vue-sonner": "^1.2.1",
+        "vuex": "^4.0.2",
+        "zod": "^3.23.8"
+    }
+}
