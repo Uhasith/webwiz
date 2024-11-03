@@ -38,6 +38,7 @@ module.exports = {
                 customGray: "#FAFCFC",
                 yellow1: "#E1F296",
                 black1: "#131313",
+                titlecolor: "#21272A",
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
