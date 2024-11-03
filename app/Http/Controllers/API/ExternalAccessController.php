@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use Inertia\Inertia;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Service\Admin\ExternalAccessService;
@@ -15,6 +17,11 @@ class ExternalAccessController extends Controller
     public function __construct(ExternalAccessService $externalAccessService)
     {
         $this->externalAccessService = $externalAccessService;
+    }
+
+    public function index(Request $request)
+    {
+        return Inertia::render('Adminview/ExternalAccess');
     }
 
     public function get(ExternalAccessGetRequest $request): JsonResponse

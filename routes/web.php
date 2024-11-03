@@ -1,20 +1,21 @@
 <?php
 
-use App\Http\Controllers\Admin\DataManagementController;
-use App\Http\Controllers\Admin\NotificationController;
-use App\Http\Controllers\Admin\OrganizationController;
-use App\Http\Controllers\Admin\ReportTemplateController;
-use App\Http\Controllers\Admin\EquipmentController;
-use App\Http\Controllers\API\EquipmentTypeController;
-use App\Http\Controllers\API\SensorController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\User\DashboardController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Response;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Response;
+use App\Http\Controllers\API\SensorController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\User\DashboardController;
+use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\API\EquipmentTypeController;
+use App\Http\Controllers\Admin\NotificationController;
+use App\Http\Controllers\Admin\OrganizationController;
+use App\Http\Controllers\API\ExternalAccessController;
+use App\Http\Controllers\Admin\DataManagementController;
+use App\Http\Controllers\Admin\ReportTemplateController;
 use App\Http\Controllers\Admin\UserManagementController;
 
 if (config('app.https_enabled', false)) {
@@ -56,6 +57,7 @@ Route::group(["prefix" => 'admin', "middleware" => ['throttle:100,1', 'admin']],
             Route::get('/data-management', [DataManagementController::class, 'index'])->name('datamanagement.index');
             Route::get('/equipments', [EquipmentController::class, 'index'])->name('equipmentmanagement.index');
             Route::get('/create-report', [ReportTemplateController::class, 'index'])->name('reporttemplate.index');
+        Route::get('/external-acess', [ExternalAccessController::class, 'index'])->name('externalacess.index');
 
         });
     Route::get('/roles-permissions', [UserManagementController::class, 'getRolesWithPermissions']);

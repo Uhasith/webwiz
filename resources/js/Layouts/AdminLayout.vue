@@ -26,7 +26,7 @@ const isActive = (paths) => {
   <Toaster richColors closeButton position="top-right" />
   <div class="h-screen flex flex-col">
     <div class="w-full border-b border-gray-300 p-5 flex justify-between items-center">
-        <a href="/admin/dashboard"><img src="/images/logo.png" alt="Centered Image" class="h-12" /></a>
+      <a href="/admin/dashboard"><img src="/images/logo.png" alt="Centered Image" class="h-12" /></a>
 
       <!-- <div class="relative">
         <input
@@ -58,11 +58,11 @@ const isActive = (paths) => {
         <ul class="space-y-4 mt-8">
           <li>
             <Link href="/admin/dashboard" :class="[
-                isActive(['/admin/dashboard'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
+              isActive(['/admin/dashboard'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
             <img src="/images/dashboardicon.svg" alt="Centered Image" class="" />
             <span class="text-md">Dashboard</span>
             </Link>
@@ -70,68 +70,79 @@ const isActive = (paths) => {
 
           <li v-if="hasPermission('View Sub Admin')">
             <Link href="/admin/dashboard/user-management" :class="[
-                isActive(['/admin/dashboard/user-management'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
+              isActive(['/admin/dashboard/user-management'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
             <img src="/images/usermgmenticon.svg" alt="Centered Image" class="" />
             <span class="text-md">User Management</span>
             </Link>
           </li>
           <li v-if="hasPermission('View Sensor Data')">
             <Link href="/admin/dashboard/data-management" :class="[
-                isActive(['/admin/dashboard/data-management'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
+              isActive(['/admin/dashboard/data-management'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
             <img src="/images/datamgmenticon.svg" alt="Centered Image" class="" />
             <span class="text-md">Data Management</span>
             </Link>
           </li>
-            <li v-if="hasPermission('View Sensor Data')">
-                <Link href="/admin/dashboard/historical-data" :class="[
-                isActive(['/admin/dashboard/historical-data'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
-                    <img src="/images/data-history.svg" alt="Centered Image" class="" />
-                    <span class="text-md">Historical Data</span>
-                </Link>
-            </li>
+          <li v-if="hasPermission('View Sensor Data')">
+            <Link href="/admin/dashboard/historical-data" :class="[
+              isActive(['/admin/dashboard/historical-data'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
+            <img src="/images/data-history.svg" alt="Centered Image" class="" />
+            <span class="text-md">Historical Data</span>
+            </Link>
+          </li>
           <li>
             <Link href="/admin/dashboard/equipments" :class="[
-                isActive(['/admin/dashboard/equipments'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
+              isActive(['/admin/dashboard/equipments'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
             <img src="/images/equipmenticon.svg" alt="Centered Image" class="" />
             <span class="text-md">Equipment</span>
             </Link>
           </li>
           <li>
             <Link href="/admin/dashboard/reports" :class="[
-                isActive(['/admin/dashboard/reports'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
+              isActive(['/admin/dashboard/reports'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
             <img src="/images/reportsicon.svg" alt="Centered Image" class="" />
             <span class="text-md">Reports</span>
             </Link>
           </li>
           <li>
             <Link href="/admin/dashboard/settings" :class="[
-                isActive(['/admin/dashboard/settings', '/admin/dashboard/settings/notification-setting'])
-                  ? 'bg-green1 text-white'
-                  : 'text-gray-700',
-                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
-              ]">
+              isActive(['/admin/dashboard/settings', '/admin/dashboard/settings/notification-setting'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
             <img src="/images/settingsicon.svg" alt="Centered Image" class="" />
             <span class="text-md">Settings</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/dashboard/external-acess" :class="[
+              isActive(['admin/dashboard/external-acess'])
+                ? 'bg-green1 text-white'
+                : 'text-gray-700',
+              'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+            ]">
+            <img src="/images/settingsicon.svg" alt="Centered Image" class="" />
+            <span class="text-md">External Access</span>
             </Link>
           </li>
         </ul>
