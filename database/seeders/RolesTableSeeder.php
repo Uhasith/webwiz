@@ -13,7 +13,7 @@ class RolesTableSeeder extends Seeder
         // Define roles
         $superadmin = Role::updateOrCreate(['name' => 'superadmin'], ['name' => 'superadmin']);
         $admin = Role::updateOrCreate(['name' => 'admin'], ['name' => 'admin']);
-        $user = Role::updateOrCreate(['name' => 'user'], ['name' => 'user']);
+//        $user = Role::updateOrCreate(['name' => 'user'], ['name' => 'user']);
 
         // Define permissions with category
         $permissions = [
@@ -44,7 +44,7 @@ class RolesTableSeeder extends Seeder
         // Remove all current permissions from roles
         $superadmin->syncPermissions([]);
         $admin->syncPermissions([]);
-        $user->syncPermissions([]);
+//        $user->syncPermissions([]);
 
         // Seed permissions
         $permissionIds = [];
@@ -61,9 +61,9 @@ class RolesTableSeeder extends Seeder
         $admin->syncPermissions($permissionIds);
 
         // Assign specific permission to user role
-        $viewReportPermission = Permission::where('name', 'View Report')->first();
-        if ($viewReportPermission) {
-            $user->syncPermissions([$viewReportPermission->id]);
-        }
+//        $viewReportPermission = Permission::where('name', 'View Report')->first();
+//        if ($viewReportPermission) {
+//            $user->syncPermissions([$viewReportPermission->id]);
+//        }
     }
 }

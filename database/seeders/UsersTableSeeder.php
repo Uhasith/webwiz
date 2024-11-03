@@ -15,26 +15,12 @@ class UsersTableSeeder extends Seeder
         // Define users with their roles
         $users = [
             [
-                'name' => 'Super Admin User',
+                'name' => 'SuperAdmin',
                 'email' => 'superadmin@example.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('32#6@sLjl0k'),
                 'role' => Utility::$superAdmin,
                 'status' => Utility::$statusActive,
-            ],
-//            [
-//                'name' => 'Admin User',
-//                'email' => 'admin@example.com',
-//                'password' => Hash::make('gtadmin1@su!olk'),
-//                'role' => Utility::$admin,
-//                'status' => Utility::$statusActive
-//            ],
-//            [
-//                'name' => 'Normal User',
-//                'email' => 'user@example.com',
-//                'password' => Hash::make("gtuser1@su!olk"),
-//                'role' => Utility::$user,
-//                'status' => Utility::$statusActive
-//            ],
+            ]
         ];
 
         // Seed users and assign roles

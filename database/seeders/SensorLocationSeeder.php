@@ -46,11 +46,11 @@ class SensorLocationSeeder extends Seeder
              ],
              [
                  'sensor_id' => 4, // Don't change
-                 'location_id' => 4, // Don't change
-                 'locationindex' => '',
+                 'location_id' => 1, // Don't change
+                 'locationindex' => '666c390ffcfe4213b71d4193',
                  'organization_id' => 1,
-                 'latitude' => 7.2906000,
-                 'longitude' => 80.6337000,
+                 'latitude' => 6.901035,
+                 'longitude' => 79.926513,
                  'status' => Utility::$statusActive
              ]
          ];
