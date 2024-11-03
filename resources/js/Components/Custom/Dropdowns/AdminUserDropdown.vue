@@ -8,15 +8,15 @@
         <div
           class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"
         >
-          <span class="text-lg font-semibold text-gray-700">KP</span>
+          <span class="text-lg font-semibold text-gray-700">{{ initials }}</span>
         </div>
         <div
-          class="absolute bottom-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"
+          class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
         ></div>
       </div>
-      <div class="flex flex-col">
-        <span class="font-medium text-sm">Katie Pena</span>
-        <span class="text-xs text-gray-500">Admin</span>
+      <div class="flex flex-col w-24 flex-shrink-0 ">
+        <span class="font-medium text-sm flex-wrap">{{ user.name }}</span>
+        <span class="text-xs text-gray-500">{{ role }}</span>
       </div>
     </div>
 
@@ -46,12 +46,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { Link, router } from "@inertiajs/vue3";
 import DropdownLink from '@/Components/DropdownLink.vue';
+import { usePage } from '@inertiajs/vue3';
 
+const page = usePage();
+
+const user = ref(page.props.auth.user);
+const roles = ref(page.props.roles);
 const dropdownOpen = ref(false);
 const dropdownContainer = ref(null);
+
+const initials = computed(() => {
+  const name = user.value.name || '';
+  const nameParts = name.match(/[A-Z][a-z]*/g) || []; 
+
+  return nameParts.length >= 2
+    ? nameParts[0][0] + nameParts[1][0]
+    : name.substring(0, 2);
+});
+
+const role = computed(() => {
+  if (roles.value && Object.keys(roles.value).length > 0) {
+    return Object.values(roles.value)[0];
+  }
+  return ''; 
+});
 
 const logout = () => {
     router.post(route('logout-now'));

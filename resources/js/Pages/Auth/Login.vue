@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, useForm } from "@inertiajs/vue3";
+import { Head, Link, useForm, usePage } from "@inertiajs/vue3";
 import AuthenticationCard from "@/Components/AuthenticationCard.vue";
 import AuthenticationCardLogo from "@/Components/AuthenticationCardLogo.vue";
 import Checkbox from "@/Components/Checkbox.vue";
@@ -7,26 +7,65 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import { watch } from "vue";
 
 defineProps({
   canResetPassword: Boolean,
   status: String,
 });
 
+const page = usePage();
+
 const form = useForm({
   email: "",
   password: "",
   remember: false,
+  showPassword: true,
+
+  errors: {
+    email: "",
+    password: "",
+    general: "",
+  },
 });
 
+const toggleShow = () => {
+  form.showPassword = !form.showPassword;
+  return
+};
+
 const submit = () => {
+
+  form.errors.email = '';
+  form.errors.password = '';
+  form.errors.general = '';
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!form.email) {
+    form.errors.email = 'Email is required';
+    return
+
+  } else if (!emailRegex.test(form.email)) {
+    form.errors.general = 'Invalid email or password';
+    return
+  }
+
+  if (!password.value) {
+    form.errors.password  = 'Password is required';
+    return;
+  }
+  
   form
     .transform((data) => ({
       ...data,
       remember: form.remember ? "on" : "",
+      _token: page.props.csrf_token,
     }))
     .post(route("login"), {
       onFinish: () => form.reset("password"),
+      onError: () => {
+        
+      },
     });
 };
 </script>
@@ -48,37 +87,57 @@ const submit = () => {
         <InputLabel
           for="email"
           value="Email"
-          class="block text-black text-sm"
+          class="block text-black text-base  ml-0 lg:ml-8"
         />
         <TextInput
           id="email"
           v-model="form.email"
-          type="email"
+          type="text"
           placeholder="Enter your email"
-          class="rounded-2xl text-sm mt-1 w-full px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          required
+          class="ml-0 lg:ml-8 text-base mt-1 w-full  lg:w-[544px]  px-3 py-1 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           autofocus
           autocomplete="username"
         />
-        <InputError class="mt-2" :message="form.errors.email" />
+        <InputError class="mt-3 ml-0 lg:ml-8" :message="form.errors.email" />
       </div>
 
       <div class="mb-4">
         <InputLabel
           for="password"
           value="Password"
-          class="block text-black text-sm"
+          class="block text-black text-base mb-1  ml-0 lg:ml-8 "
         />
-        <TextInput
+
+        <div class="relative flex lg:max-w-[578px]">
+        <input v-if="form.showPassword"
           id="password"
           v-model="form.password"
           type="password"
-          placeholder="********"
-          class="rounded-2xl text-sm mt-1 w-full px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          required
+          placeholder="••••••••••••"
+          class="rounded-md  text-base ml-0 lg:ml-8  m-auto w-full  px-3 py-1 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           autocomplete="current-password"
+          
         />
-        <InputError class="mt-2" :message="form.errors.password" />
+        <input v-else
+          id="password"
+          v-model="form.password"
+          type="text"
+          placeholder="••••••••••••"
+          class="rounded-md  text-base ml-0 lg:ml-8  m-auto w-full  px-3 py-1 border border-gray-300  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          autocomplete="current-password"
+          
+        />
+        
+        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 hover:bg-gray-100 rounded-full" @click.prevent="toggleShow">
+          <img
+            :src="form.showPassword ? '/images/closedEye.svg' : '/images/eye.svg'"
+            :alt="showPassword ? 'Hide password' : 'Show password'"
+            class="h-4 w-8"
+        />
+        </button>
+      </div>
+        <InputError class="mt-3 ml-0 lg:ml-8" :message="form.errors.password || form.errors.general" />
+       
       </div>
 
       <div class="flex items-center justify-between mb-4">
@@ -87,23 +146,23 @@ const submit = () => {
             v-model:checked="form.remember"
             id="remember_me"
             name="remember_me"
-            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded text-sm"
+            class="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded text-sm mt-5 ml-0 lg:ml-8 "
           />
-          <label for="remember_me" class="ml-2 block text-gray-900 text-xs"
+          <label for="remember_me" class="block text-gray-500 text-sm mt-5 ml-2"
             >Remember for 30 days</label
           >
         </div>
         <Link
           v-if="canResetPassword"
           :href="route('password.request')"
-          class="text-xs text-green-600 hover:underline"
+          class="text-base text-green-600 hover:underline mt-5 mr-8 sm:mr-0"
           >Forgot password</Link
         >
       </div>
 
       <div>
         <PrimaryButton
-          class="rounded-2xl w-full text-sm bg-green1 text-white py-1 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+          class="rounded-2xl  ml-0 w-full  lg:w-[544px] text-sm bg-green1 text-white py-1 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 mt-5 lg:ml-8 "
           :class="{ 'opacity-25': form.processing }"
           :disabled="form.processing"
           style="display: flex; align-items: center; justify-content: center"

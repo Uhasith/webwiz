@@ -20,7 +20,6 @@ class General
     public function handle(Request $request, Closure $next): mixed
     {
         $userAgent = $request->header('User-Agent');
-        Log::info($userAgent);
 
         if ($userAgent && (str_contains($userAgent, 'Mozilla') || str_contains($userAgent, 'Chrome'))) {
             return $next($request);

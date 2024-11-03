@@ -50,7 +50,7 @@ class WeatherService{
         Log::info($data);
 
         return [
-            'sensorLocationId'=>$sensorLocationId,
+            'sensor_location_id'=>$sensorLocationId,
             'temperature' => $data[0]['v3-wx-observations-current']['temperature'],
             'wind' => $data[0]['v3-wx-observations-current']['windSpeed'],
             'humidity' => $data[0]['v3-wx-observations-current']['relativeHumidity'],
@@ -58,11 +58,6 @@ class WeatherService{
             'cloud' => $data[0]['v3-wx-observations-current']['cloudCoverPhrase']
         ];
 
-    }
-
-    public function saveTempWeather($data,$sensorDataId): WeatherRecords
-    {
-        return $this->weatherRecordsRepo->save($data,$sensorDataId);
     }
 
     public  function saveWeatherList($weatherData){

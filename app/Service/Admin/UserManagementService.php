@@ -2,6 +2,7 @@
 
 namespace App\Service\Admin;
 
+use App\Models\User;
 use App\Repository\Admin\RoleRepo;
 use App\Repository\Admin\UserRepo;
 use Spatie\Permission\Models\Role;
@@ -64,6 +65,12 @@ class UserManagementService
 
         if (!$role) {
             throw new \Exception('Role not found');
+        }
+
+        $users = User::role($role->name)->get();
+
+        if ($users->count() > 0) {
+            throw new \Exception('Role has associated users');
         }
 
         return $this->roleRepository->deleteRole($role);

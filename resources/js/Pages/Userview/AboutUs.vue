@@ -1,7 +1,7 @@
 <template>
   <UserLayout>
     <div
-      class="bg-[url('/images/aboutheader.png')] bg-cover bg-center relative h-[400px] flex items-center justify-center"
+      class="bg-[url('/images/hero.png')] bg-cover bg-center relative h-[400px] flex items-center justify-center"
     >
       <div class="text-center z-10">
         <h1 class="mainheading font-bold">{{ $t('About Us') }}</h1>
@@ -94,28 +94,28 @@
       <div class="mx-auto flex mt-[90px]">
         <div class="flex-shrink-0">
           <img
-            src="images/aboutusvm.png"
+            src="/images/aboutusvm.png"
             alt="Illustrative globe with tree"
             class="w-full h-auto hidden lg:block"
           />
         </div>
 
-        <div class="w-20 flex-shrink-0"></div>
+       <div class="w-0 sm:w-20"></div>
 
-        <div class="flex-grow flex flex-col">
+        <div class="flex-grow flex flex-col ">
           <div
-            class="flex-grow mb-6 p-6 bg-[url('/images/missionbg.png')] bg-cover bg-right-bottom bg-no-repeat relative overflow-hidden"
+            class="flex-grow mb-6 p-6 "
           >
-            <h2 class="aboutheading1 font-semibold mb-4">{{ $t('Our Mission') }}</h2>
-            <p class="text-[18px]">
+            <h2 class="aboutheading1 font-semibold mb-4 ">{{ $t('Our Mission') }}</h2>
+            <p class="text-[18px] text-md text-justify ">
               {{ $t('Our mission is to empower') }}
             </p>
           </div>
           <div
-            class="flex-grow mb-6 p-6 bg-[url('/images/visionbg.png')] bg-cover bg-right-bottom bg-no-repeat relative overflow-hidden"
+            class="flex-grow mb-6 p-6 "
           >
             <h2 class="aboutheading1 font-semibold mb-4">{{ $t('Our Vision') }}</h2>
-            <p class="text-[18px]">
+            <p class="text-[18px] text-md text-justify">
               {{ $t('We envision a future') }}
             </p>
           </div>
@@ -123,7 +123,7 @@
       </div>
 
       <div class="w-full text-center mb-16 mt-[90px]">
-        <h2 class="text-black1 aboutheading1 font-semibold">{{ $t('Contact Us') }}</h2>
+        <h2 class="text-black1 aboutheading1 font-semibold mb-4">{{ $t('Contact Us') }}</h2>
         <p class="text-lg">
           {{ $t('If you have any questions') }}
         </p>
@@ -134,7 +134,7 @@
           class="mb-4 md:mb-0 w-full lg:w-1/3 p-6 border border-green1 rounded-3xl flex flex-col items-center text-center"
         >
           <img
-            src="images/mailicon.svg"
+            src="/images/mailicon.svg"
             alt="Email Icon"
             class="w-8 h-8 object-contain"
           />
@@ -146,7 +146,7 @@
           class="mb-4 md:mb-0 w-full lg:w-1/3 p-6 border border-green1 rounded-3xl flex flex-col items-center text-center"
         >
           <img
-            src="images/phoneicon.svg"
+            src="/images/phoneicon.svg"
             alt="Email Icon"
             class="w-8 h-8 object-contain"
           />
@@ -158,7 +158,7 @@
           class="mb-4 md:mb-0 w-full lg:w-1/3 p-6 border border-green1 rounded-3xl flex flex-col items-center text-center"
         >
           <img
-            src="images/addressicon.svg"
+            src="/images/addressicon.svg"
             alt="Email Icon"
             class="w-8 h-8 object-contain"
           />

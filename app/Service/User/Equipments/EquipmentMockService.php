@@ -41,13 +41,16 @@ class EquipmentMockService implements IEquipmentService
                 "updated_at"=>Carbon::now()
             ],
             "weather_data" => [
-                "sensorLocationId" => $sensorLocationId,
+                "sensor_location_id" => $sensorLocationId,
                 "temperature" => rand(-10, 40),
                 "pressure" => rand(950, 1050),
                 "humidity" => rand(0, 100),
                 "precipitation" => rand(0, 100),
                 "cloud" => Utility::$cloudConditions[array_rand(Utility::$cloudConditions)],
-                "wind" => rand(0, 100)
+                "wind" => rand(0, 100),
+                "created_at"=>Carbon::now(),
+                "updated_at"=>Carbon::now()
+                
             ],
             "optional_data"=>[
 
@@ -93,15 +96,17 @@ class EquipmentMockService implements IEquipmentService
                 "humidity" => rand(0, 100),
             ],
             "weather_data" => [
-                "sensorLocationId" => $sensorLocationId,
+                "sensor_location_id" => $sensorLocationId,
                 "temperature" => rand(-10, 40),
                 "pressure" => rand(950, 1050),
                 "humidity" => rand(0, 100),
                 "cloud" => Utility::$cloudConditions[array_rand(Utility::$cloudConditions)],
-                "wind" => rand(0, 100)
+                "wind" => rand(0, 100),
+                "created_at"=>Carbon::now(),
+                "updated_at"=>Carbon::now()
             ],
             "optional_data"=>[
-               'sensorLocationId' => $sensorLocationId,
+               'sensor_location_id' => $sensorLocationId,
                'ch4' => $data['ch4'] ?? null,
                'tvoc' => $data['tvoc'] ?? null,
             ]
@@ -130,12 +135,14 @@ class EquipmentMockService implements IEquipmentService
                 "humidity" => rand(0, 100),
             ],
             "weather_data" => [
-                "sensorLocationId" => $sensorLocationId,
+                "sensor_location_id" => $sensorLocationId,
                 "temperature" => rand(-10, 40),
                 "pressure" => rand(950, 1050),
                 "humidity" => rand(0, 100),
                 "cloud" => Utility::$cloudConditions[array_rand(Utility::$cloudConditions)],
-                "wind" => rand(0, 100)
+                "wind" => rand(0, 100),
+                "created_at"=>Carbon::now(),
+                "updated_at"=>Carbon::now()
             ],
             "optional_data"=>[
 
@@ -162,12 +169,14 @@ class EquipmentMockService implements IEquipmentService
                 "humidity" => rand(0, 100),
             ],
             "weather_data" => [
-                "sensorLocationId" => $sensorLocationId,
+                "sensor_location_id" => $sensorLocationId,
                 "temperature" => rand(-10, 40),
                 "pressure" => rand(950, 1050),
                 "humidity" => rand(0, 100),
                 "cloud" => Utility::$cloudConditions[array_rand(Utility::$cloudConditions)],
-                "wind" => rand(0, 100)
+                "wind" => rand(0, 100),
+                "created_at"=>Carbon::now(),
+                "updated_at"=>Carbon::now()
             ],
             "optional_data"=>[
                "sensor_location_id" => $sensorLocationId,

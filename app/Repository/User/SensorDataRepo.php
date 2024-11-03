@@ -95,7 +95,7 @@ class SensorDataRepo
         return SensorDatas::with('weatherRecords')
             ->whereBetween('created_at', [$start->format('Y-m-d H:i:s'), $end->format('Y-m-d H:i:s')])->get();
     }
-    public function getSensorData($locationId, $equipmentId, $thisYear = false,$daily = false)
+    public function getSensorData($locationId, $equipmentId, $thisYear = false,$daily = false,$start = null,$end = null)
     {
         if($thisYear){
             return MonthlySensorData::whereHas('sensorLocation', function ($query) use ($locationId,$equipmentId) {
@@ -114,6 +114,16 @@ class SensorDataRepo
                 ->with('sensorLocation.location')
                 ->whereBetween('created_at', [Carbon::now()->startOfMonth()->format('Y-m-d H:i:s'),Carbon::now()->endOfMonth()->format('Y-m-d H:i:s')])
                 ->where('status',Utility::$statusActive)->orderBy('created_at','asc')->get();
+        }
+        if($start && $end){
+            return SensorDatas::whereHas('sensorLocation', function ($query) use ($locationId, $equipmentId) {
+                $query->where('sensor_id', $equipmentId);
+                $query->where('location_id', $locationId);
+            })
+                ->with('sensorLocation.location')
+                ->with('weatherRecords')
+                ->whereBetween('created_at', [$start, $end])
+                ->where('status', Utility::$statusActive)->get();
         }
 
         return SensorDatas::whereHas('sensorLocation', function ($query) use ($locationId, $equipmentId) {

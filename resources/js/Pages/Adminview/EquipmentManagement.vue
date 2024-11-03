@@ -83,7 +83,7 @@ const initializeDataTable = () => {
             { data: "name", name: "name" },
             { data: "type_name", name: "type_name"},
             { data: "organization_name", name: "organization_name" },
-            { data: null , render: function() { return "Desc 1"; }},
+            // { data: null , render: function() { return "Desc 1"; }},
             {data: "status", name: "status" },
             { data: null, render: function() { return "Admin 2"; }},
             { data: null, orderable: false, searchable: false, render: function(data, type, row) {
@@ -486,7 +486,7 @@ const exportEquipmentReords = async () =>  {
                   <th class="py-3 px-6">Equipment Name</th>
                   <th class="py-3 px-6">Type</th>
                   <th class="py-3 px-6">Manufacturer</th>
-                  <th class="py-3 px-6">Description</th>
+<!--                  <th class="py-3 px-6">Description</th>-->
                   <th class="py-3 px-6">Status</th>
                   <th class="py-3 px-6">Entered By</th>
                   <th class="py-3 px-6"></th>

@@ -8,7 +8,7 @@ class LocationsRepo{
 
 
     public function getAllSensorLocations(){
-        return Locations::whereHas('sensorLocations')->get();
+        return Locations::whereHas('sensorLocations')->with('district.province')->get();
     }
 
     public function getLocationsQuery(): \Illuminate\Database\Eloquent\Builder

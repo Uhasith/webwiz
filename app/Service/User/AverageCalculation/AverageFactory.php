@@ -28,7 +28,6 @@ class AverageFactory
             Log::info("Average Mock Enabled");
             return new AverageMockService($sensorLocationRepo);
         }
-        Log::info("AverageService is Enabled");
         return new AverageService($sensorRepo,$hourlyRepo,$dailyRepo,$weeklyRepo,$monthlyRepo);
     }
 }

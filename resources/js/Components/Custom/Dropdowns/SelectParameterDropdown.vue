@@ -6,7 +6,7 @@
       rounded-full border hover:border-gray-400 focus:outline-none focus:border-gray-400"
     >
       <span class="flex items-center">
-        <span class="pr-1 font-semibold text-[#13131380]">{{ selectedParameter || $t('Select Parameter') }}</span>
+        <span class="pr-1 font-semibold text-[#13131380] text-left">{{ selectedParameter || $t('Select Parameter') }}</span>
       </span>
 
       <svg

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Utility;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -29,9 +30,19 @@ class UserManagementController extends Controller
 
     public function index(Request $request)
     {
-        $roles = Role::all()->pluck('name', 'id');
+        $roles = Role::where('name', '!=', Utility::$superAdmin)->pluck('name', 'id');
         $rolesWithPermissions = Role::select('id', 'name')->with('permissions')->orderBy('id')->get();
         $groupedPermissions = Permission::all()->groupBy('category');
+
+        // Check if the user is a superadmin
+        $isSuperAdmin = auth()->user()->hasRole('superadmin');
+
+        // Exclude "permission_management" category if the user is not a superadmin
+        if (!$isSuperAdmin) {
+            $groupedPermissions = $groupedPermissions->filter(function ($permissions, $category) {
+                return $category !== 'permission_management';
+            });
+        }
 
         return Inertia::render('Adminview/UserManagement', [
             'rolesWithPermissions' => $rolesWithPermissions,
@@ -42,9 +53,9 @@ class UserManagementController extends Controller
 
     public function getUsersData(Request $request)
     {
-        $query = User::with('roles')->select(['id', 'name', 'email', 'contact', 'last_login_at']);
+        $query = User::with('roles')->select(['id', 'name', 'email', 'contact', 'last_login_at','status'])->orderBy('id', 'desc');
 
-         // Exclude users with the 'superadmin' role
+        // Exclude users with the 'superadmin' role
         $query->whereDoesntHave('roles', function ($q) {
             $q->where('name', 'superadmin');
         });
@@ -60,8 +71,8 @@ class UserManagementController extends Controller
             $searchTerm = $request->get('search');
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('contact', 'like', "%{$searchTerm}%")
-                  ->orWhere('email', 'like', "%{$searchTerm}%");
+                    ->orWhere('contact', 'like', "%{$searchTerm}%")
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -103,7 +114,8 @@ class UserManagementController extends Controller
         }
     }
 
-    public function delete($id){
+    public function delete($id)
+    {
         $data = $this->userRepository->findUserData($id);
         $data->delete();
 

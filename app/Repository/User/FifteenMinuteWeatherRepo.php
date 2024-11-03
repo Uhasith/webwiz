@@ -15,7 +15,7 @@ class FifteenMinuteWeatherRepo
         $id = Uuid::generate() . "";
         $fifteenMinute = new FifteenMinuteWeatherData();
         $fifteenMinute->id = $id;
-        $fifteenMinute->sensor_location_id = $data['sensorLocationId'];
+        $fifteenMinute->sensor_location_id = $data['sensor_location_id'];
         $fifteenMinute->status = Utility::$statusActive;
         $fifteenMinute->humidity = $data['humidity'] ?? null;
         $fifteenMinute->wind = $data['wind'] ?? null;

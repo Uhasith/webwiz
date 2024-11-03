@@ -1,8 +1,24 @@
+<style>
+/* Rotate content when in landscape orientation */
+@media screen and (orientation: landscape) {
+   /* #app {
+        transform: rotate(-90deg);
+        width: 100vh;
+        height: 100vw;
+        overflow: hidden;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform-origin: center center;
+    } */
+}
+
+</style>
 <template>
     <UserLayout>
         <div class="px-4 bg-lightergray py-6">
             <div class="text-center">
-                <h1 class="text-lg md:text-3xl font-bold">
+                <h1 class="text-lg md:text-3xl font-bold mb-3">
                     {{ $t("Air Quality Monitoring Dashboard") }}
                 </h1>
                 <p class="text-sm">
@@ -10,7 +26,7 @@
                 </p>
             </div>
         </div>
-        <div class="fixed inset-x-0 bottom-0 lg:hidden mobile_compare z-[2001]">
+        <div class="fixed inset-x-0 bottom-0 lg:hidden mobile_compare z-[2001] mb-16">
             <div class="flex justify-end px-4 pb-4">
                 <Link
                     href="/public/comparison"
@@ -28,7 +44,7 @@
                         <div class="lg:flex lg:justify-between px-4 lg:px-0 mb-6 lg:mb-4">
                             <div class="flex justify-between">
                                 <div>
-                                    <h1 class="text-2xl md:text-[2.8rem] font-bold">
+                                    <h1 class="text-2xl md:text-[2.8rem] font-bold mb-3">
                                         {{ $t("Sri Lanka") }}
                                     </h1>
                                     <div class="inline-block text-left">
@@ -117,18 +133,18 @@
                                     <div class="w-px h-8 bg-gray-300 mx-4"></div>
                                     <div class="flex flex-col items-center">
                                         <span class="text-sm text-gray-600">{{
-                                                markarData.sensor_location?.location.name ?? mapDefaultData?.sensor_location?.location.name
+                                               $t( markarData.sensor_location?.location.name ?? mapDefaultData?.sensor_location?.location.name)
                                             }}</span>
                                         <img :src="faces(markarData?.aqi,mapDefaultData?.aqi)"
-                                             class="h-10"
+                                             class="h-10 mt-3"
                                         />
                                     </div>
                                 </div>
-                                <div class="mt-2 text-center">
+                                <div style="margin-top: 21px" class=" text-center">
                                     <div :class="ranking(markarData?.aqi,mapDefaultData?.aqi)"
-                                         class="text-md font-semibold border rounded-full py-1 my-4 cursor-pointer"
+                                         class="text-md font-semibold border rounded-full py-1 my-4"
                                     >
-                                        {{ markarData?.aqi?.SL ?? mapDefaultData?.aqi.SL }}
+                                        {{ $t(markarData?.aqi?.SL ?? mapDefaultData?.aqi.SL) }}
                                     </div>
                                     <div class="text-xs text-gray-500">
                                         {{ $t("Last Update") }}:
@@ -151,7 +167,7 @@
                             <div v-if="markarData?.weather_records || mapDefaultData?.weather_records"
                                  class="bg-white border border-gray-200 rounded-lg p-4 lg:col-span-3"
                             >
-                                <h3 class="font-bold text-lg mb-2">Weather Facts</h3>
+                                <h3 class="font-bold text-lg mb-2">{{$t("Weather Facts")}}</h3>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center">
                                         <div class="flex items-start space-x-1">

@@ -13,7 +13,7 @@ class WeatherRecordsRepo
     {
         $weatherData = new WeatherRecords();
         $weatherData->id = Uuid::generate();
-        $weatherData->sensor_location_id = $data['sensorLocationId'];
+        $weatherData->sensor_location_id = $data['sensor_location_id'];
         $weatherData->status = Utility::$statusActive;
         $weatherData->humidity = $data['humidity'];
         $weatherData->wind = $data['wind'];

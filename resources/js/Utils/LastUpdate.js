@@ -32,7 +32,13 @@ export function modifyDate(date, days) {
 export function getHoursWithAMPM(dateArray) {
     return dateArray.map(timestamp => {
         const date = new Date(formatDate(timestamp));
-        return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+        return date.toLocaleTimeString('en-US', {day:'2-digit', hour: 'numeric', hour12: true });
+    });
+}
+export function getMinutesWithHoursWithAMPM(dateArray) {
+    return dateArray.map(timestamp => {
+        const date = new Date(formatDate(timestamp));
+        return date.toLocaleTimeString('en-US', {day:'2-digit', hour: 'numeric',minute: 'numeric', hour12: true });
     });
 }
 export function getDaysByDate(dateArray) {

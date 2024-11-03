@@ -19,6 +19,7 @@ const password = ref('');
 const password_confirmation = ref('');
 const error = ref('');
 const passwordError = ref('');
+const confirmPasswordError = ref('');
 const passwordNotMatchError = ref('')
 const isSubmitting = ref(false);
 const { successMessage, errorMessage, resetMessages } = reset();
@@ -35,6 +36,7 @@ const submit = async () => {
   error.value = '';
   passwordError.value = '';
   passwordNotMatchError.value='';
+  confirmPasswordError.value='';
   
 
   if (otp.value.trim() === '') {
@@ -50,20 +52,20 @@ const submit = async () => {
   }
 
   if (password_confirmation.value.trim() === '') {
-    passwordError.value = "Password confirmation is required.";
+    confirmPasswordError.value = "Confirm password is required";
     isSubmitting.value = false;
     return;
   }
 
  
   if (!validatePassword(password.value)) {
-    passwordError.value = 'Password should contain at least one uppercase letter, one lowercase letter, one number, and one special character.';
+    passwordError.value = 'The password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one special character, and one number.';
     isSubmitting.value = false;
     return;
   } 
   
   if (password.value !== password_confirmation.value) {
-    passwordNotMatchError.value = 'Passwords do not match.';
+    passwordNotMatchError.value = 'Passwords does not match.';
     isSubmitting.value = false;
     return;
   }
@@ -138,7 +140,7 @@ const submit = async () => {
                     class="mt-1 block w-full"
                     autocomplete="new-password"
                 />
-                <InputError class="mt-2" :message="passwordNotMatchError" />
+                <InputError class="mt-2" :message="passwordNotMatchError||confirmPasswordError" />
             </div>
 
             <div class="flex justify-center items-center mt-8">

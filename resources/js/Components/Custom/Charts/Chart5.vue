@@ -4,6 +4,7 @@ import { onMounted, ref } from "vue";
 import getMapDataService from "@/Services/getMapData.js";
 import {getHoursWithAMPM} from "@/Utils/LastUpdate.js";
 
+
 let chartCanvas = ref(null);
 const props = defineProps({
     data: Object
@@ -28,14 +29,16 @@ const config = {
   type: "line",
   data: hourlyData,
   options: {
-    aspectRatio: 2.5, // Adjust this value to change the height of the chart
+    responsive: true,
+    maintainAspectRatio: false, // Adjust this value to change the height of the chart
     scales: {
       y: {
         beginAtZero: false,
-        min: 10,
+        min: 0,
         max: 40,
         ticks: {
           stepSize: 10,
+         
         },
         grid: {
           drawBorder: false,
@@ -44,6 +47,8 @@ const config = {
           display: false,
         },
       },
+
+      
       x: {
         grid: {
           display: false,
@@ -88,7 +93,7 @@ async function fetch24HData(sensor_location_id) {
 </script>
 
 <template>
-  <div>
+  <div >
     <canvas ref="chartCanvas"></canvas>
   </div>
 </template>

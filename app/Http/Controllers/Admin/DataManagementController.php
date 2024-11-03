@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\AqiService;
+use App\Helpers\Utility;
+use App\ModelsV2\HourlySensorData;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\ModelsV2\SensorDatas;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Repository\Admin\SensorRepo;
 use App\Service\User\SensorsService;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 use App\Http\Requests\Admin\SensorDataUpdateRequest;
@@ -85,6 +88,30 @@ class DataManagementController extends Controller
                 ->get();
             return response()->json($data);
         }
+        if($m_type != "all"){
+            $data = DB::table('locations')
+                ->select(
+                    'locations.id',
+                    'locations.name',
+                )
+                ->join('sensor_locations', 'locations.id', '=', 'sensor_locations.location_id')
+                ->join('sensors', 'sensor_locations.sensor_id', '=', 'sensors.id')
+                ->Where('sensors.id', '=', "$m_type")
+                ->get();
+            return response()->json($data);
+        }
+        if($e_type != "all"){
+            $data = DB::table('locations')
+                ->select(
+                    'locations.id',
+                    'locations.name',
+                )
+                ->join('sensor_locations', 'locations.id', '=', 'sensor_locations.location_id')
+                ->join('sensors', 'sensor_locations.sensor_id', '=', 'sensors.id')
+                ->Where('sensors.equipment_type_id', '=', "$e_type")
+                ->get();
+            return response()->json($data);
+        }
     }
     public function getSensorDetails(Request $request)
     {
@@ -101,8 +128,6 @@ class DataManagementController extends Controller
         $selectsensors = $request->get('selectsensors', '');
         $selectProvince = $request->get('typeFilteredProvince');
 
-        // Log::info($request->all());
-
         // Handle the "all" cases
         if ($selectedEquipmentType === "all") {
             $selectedEquipmentType = '';
@@ -114,11 +139,22 @@ class DataManagementController extends Controller
             $searchTerm = $selectProvince;
         }
 
-        // Start building the base query
+        // Get the current authenticated user
+        $user = Auth::user();
+
+        // Start the base query
         $query = DB::table('sensor_datas')
+            ->whereNull('sensor_datas.deleted_at')
             ->join('sensor_locations', 'sensor_datas.sensor_location_id', '=', 'sensor_locations.id')
+            ->join('weather_records', 'sensor_datas.id', '=', 'weather_records.sensor_data_id')
             ->join('locations', 'sensor_locations.location_id', '=', 'locations.id')
             ->join('sensors', 'sensor_locations.sensor_id', '=', 'sensors.id');
+
+
+        if (!$user->hasRole('superadmin')) {
+            $organizationIds = $user->userOrganizations()->pluck('organization_id')->toArray();
+            $query->whereIn('sensor_locations.organization_id', $organizationIds);
+        }
 
         // Apply the date range filter if both $start and $end are provided
         if ($start && $end) {
@@ -166,32 +202,41 @@ class DataManagementController extends Controller
                 'sensor_datas.co2',
                 'sensor_datas.aqi',
                 'sensor_datas.status',
-                'sensors.equipment_type_id'
+                'sensors.equipment_type_id',
+                'temperature',
+                'pressure',
+                'wind',
+                'humidity',
+                'precipitation',
             )
             ->orderBy('sensor_datas.created_at', 'desc') // Order by latest records
             ->skip($offset)
             ->take($perPage)
             ->get();
 
-        // Load units from the AQI JSON file
-        $aqiPath = base_path('aqi_data.json');
-        $units = (json_decode(file_get_contents($aqiPath), true))['units'];
-
         // Format the response for DataTables
         $dataTable = DataTables::of($data)
-            ->addColumn('pm2_5', fn($data) => $data->pm2_5 ? $data->pm2_5 . $units['PM2.5'] : '')
-            ->addColumn('pm10', fn($data) => $data->pm10 ? $data->pm10 . $units['PM10'] : '')
-            ->addColumn('o3', fn($data) => $data->o3 ? $data->o3 . $units['O3'] : '')
-            ->addColumn('co', fn($data) => $data->co ? $data->co . $units['CO'] : '')
-            ->addColumn('no2', fn($data) => $data->no2 ? $data->no2 . $units['NO2'] : '')
-            ->addColumn('so2', fn($data) => $data->so2 ? $data->so2 . $units['SO2'] : '')
-            ->addColumn('co2', fn($data) => $data->co2 ? $data->co2 . 'ppb' : '')
+            ->addColumn('pm2_5', fn($data) => $data->pm2_5 ?? '')
+            ->addColumn('pm10', fn($data) => $data->pm10 ?? '')
+            ->addColumn('o3', fn($data) => $data->o3 ?? '')
+            ->addColumn('co', fn($data) => $data->co ?? '')
+            ->addColumn('no2', fn($data) => $data->no2 ?? '')
+            ->addColumn('so2', fn($data) => $data->so2 ?? '')
+            ->addColumn('co2', fn($data) => $data->co2 ?? '')
+            ->addColumn('temperature', fn($data) =>  $data->temperature ?? '')
+            ->addColumn('pressure', fn($data) =>   $data->pressure ?? '')
+            ->addColumn('wind', fn($data) =>   $data->wind ?? '')
+            ->addColumn('humidity', fn($data) =>   $data->humidity ?? '')
+            ->addColumn('precipitation', fn($data) =>   $data->precipitation ?? '')
             ->make(true);
 
         // Add numberOfPages to the response
         $response = $dataTable->getData(true);
         $response['numberOfPages'] = $numberOfPages;
         $response['selectsensors'] = $selectsensors;
+        $response['filteredDataCount'] = $totalRecords;
+        $response['lastUpdatedDate'] = SensorDatas::where('status',Utility::$statusActive)->latest('created_at')
+            ->value('created_at');
         $response['selectedEquipmentType'] = $selectedEquipmentType;
 
         return response()->json($response);

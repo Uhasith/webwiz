@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-md mx-auto p-2 bg-white">
+  <div class=" md:w-[600px] mx-auto p-2 bg-white">
     <div class="flex justify-start mb-4">
       <Link href="/" class="text-gray-600">
         <svg
@@ -29,7 +29,7 @@
 <!--      <MeasuredByDropdown class="mt-3" />-->
 <!--    </div>-->
 
-    <div class="w-full flex justify-center items-center mt-[26px]">
+    <div class="w-full  flex justify-center items-center mt-[26px]">
       <img src="/images/pinicon.png" class="h-4 w-auto mr-2" />
       <p class="font-bold text-lg">
         {{
@@ -116,7 +116,7 @@
     </div>
 
     <div>
-      <h3 class="mt-6 text-[20px] font-bold">AQI Trend in Last 24 Hours</h3>
+      <h3 class="mt-7 text-[20px] font-bold">AQI Trend in Last 24 Hours</h3>
     </div>
 
     <div class="mt-6">
@@ -296,11 +296,12 @@ const { t } = useI18n();
 
 const store = useStore();
 
-const markarData = computed(() => store.state.markarData);
+let markarData = computed(() => store.state.markarData);
 
-
+watch(() => store.state.markarData, (newData) => {
+});
 onMounted(() => {
-  // console.log(markarData);
+
 });
 
 

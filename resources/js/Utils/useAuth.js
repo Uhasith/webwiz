@@ -10,12 +10,12 @@ export default function useAuth() {
 
     // Method to check if user has a specific role
     function hasRole(role) {
-        return roles.value.includes(role);
+       return roles.value.some((r) => r.name === role);
     }
 
     // Method to check if user has a specific permission
     function hasPermission(permission) {
-        return permissions.value.includes(permission);
+        return permissions.value.some((p) => p.name === permission);
     }
 
     // Expose the methods and properties

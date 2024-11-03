@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Inertia\Middleware;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 
 class HandleInertiaRequests extends Middleware
@@ -37,7 +38,6 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        // Log::info($request->user()->getPermissionNames());
         return array_merge(parent::share($request), [
             'locale' => app()->getLocale(),
             'csrf_token' => csrf_token(),
@@ -46,7 +46,9 @@ class HandleInertiaRequests extends Middleware
             'permissions' => fn() => $request->user()
                 ? $request->user()->getAllPermissions()
                 : null,
-            'roles' => fn() => $request->user() ? $request->user()->getRoleNames() : null
+            'roles' => fn() => $request->user() ? $request->user()->getRoleNames() : null,
+            'allRoles' => fn() => $request->user() ? Role::all()->pluck('name', 'id') : null,
+            'isSuperAdmin' => fn() => $request->user() ? $request->user()->hasRole('superadmin') : null
         ]);
     }
 }

@@ -111,7 +111,7 @@ class AqiService
             }
             $startRange = explode("-", $key)[0];
             $endRange = explode("-", $key)[1];
-            if ($param >= $startRange && $param < $endRange) {
+            if ($param >= $startRange && $param <= $endRange) {
                 $result = $this->calculateAqi( $startRange, $endRange, $param,$breakpoint[$key]["lo"], $breakpoint[$key]["hi"]);
                 return $this->aqiJson($data, $result);
             }
@@ -146,7 +146,7 @@ class AqiService
         foreach (array_keys($range) as $key) {
             $startRange = explode("-", $key)[0];
             $endRange = explode("-", $key)[1];
-            if ($aqi >= $startRange && $aqi < $endRange) {
+            if ($aqi >= $startRange && $aqi < $endRange+1) {
                 return $range[$key]['status'];
             }
         }

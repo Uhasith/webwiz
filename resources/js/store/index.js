@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import createPersistedState from "vuex-persistedstate";
 
 const store = createStore({
     state() {
@@ -115,13 +116,18 @@ const store = createStore({
         },
         updateComparativeLevelChart4(state, param) {
             state.comparativeData = param;
+        },
+        setMarkarData(state, data) {
+            state.markarData = data;
         }
     },
     getters: {
         getSelectedSensor(state) {
             return state.sensor;
         }
-    }
+    },
+    plugins: [createPersistedState({ storage: window.localStorage })]
+
 });
 
 export default store;

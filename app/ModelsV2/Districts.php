@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Districts extends Model
 {
+
+    protected $table = "districts";
     /**
      * @var array
      */

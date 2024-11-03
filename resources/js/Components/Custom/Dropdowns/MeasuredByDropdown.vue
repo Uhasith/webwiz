@@ -6,7 +6,7 @@
             :class="customClass"
         >
       <span class="flex items-center">
-        <span class="pr-1 font-semibold text-[#13131380]">{{ $t('Measured By') }}:</span>
+        <span class="pr-1 font-semibold text-[#13131380] text-left">{{ $t('Measured By') }}:</span>
         <span class="font-semibold text-[#016553]">{{
                 selectedSensor?.name
             }}</span>
@@ -29,7 +29,7 @@
         <!-- Dropdown menu -->
         <div
             v-if="dropdownOpen"
-            class="origin-top-right z-[2001] absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+            class="origin-top-right z-[2001] absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
             role="menu"
             aria-orientation="vertical"
             aria-labelledby="menu-button"

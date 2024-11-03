@@ -4,7 +4,7 @@ import {defineEmits, onMounted, ref} from "vue";
 import store from "@/store/index.js";
 import {
     getDaysByDate,
-    getHoursWithAMPM,
+    getHoursWithAMPM, getMinutesWithHoursWithAMPM,
     getMonthsByDate,
     getWeeksByDate,
     getYearByDate,
@@ -71,6 +71,9 @@ async function getHistoricalData() {
 
                 let aqis = result.result.map(item => item.pm2_5_status === "ACTIVE" ? item.pm2_5_aqi.AQI : null);
 
+                if (result.type === "today") {
+                    displayChart(Math.ceil(Math.max(...aqis.map(Number)) / 100) * 100, getMinutesWithHoursWithAMPM(createdAts), aqis);
+                }
                 if (result.type === "hourly") {
                     displayChart(Math.ceil(Math.max(...aqis.map(Number)) / 100) * 100, getHoursWithAMPM(createdAts), aqis);
                 }
@@ -129,8 +132,8 @@ const config = {
   type: "bar",
   data,
   options: {
-    responsive: false,
-    maintainAspectRatio: false,
+      responsive: true,
+      maintainAspectRatio: false,
     scales: {
       x: {
         grid: {

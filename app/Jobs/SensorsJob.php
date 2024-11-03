@@ -54,7 +54,7 @@ class SensorsJob implements ShouldQueue
         $hourly = new HourlySensorDataRepo();
         $echoTechRepo = new EchoTechSensorDataRepo();
 
-        $sensorService = new SensorsService($sensorRepo, $sensorDataRepo,$hourly, $equipmentType);
+        $sensorService = new SensorsService($sensorRepo, $sensorDataRepo,$hourly, $equipmentType,$aqiService);
         $weatherService = new WeatherService($weatherRepo, $sensorLocation);
 
         $equipmentFactory =  new EquipmentFactory();
@@ -112,7 +112,6 @@ class SensorsJob implements ShouldQueue
 
         $ecoTech = $equipmentFactory->getInstance()->ecoTech();
         if (is_array($ecoTech)) {
-
             $sensorDataEcoTechArray = [];
             $weatherEcoTechDataArray = [];
             $optionalEcoTechDataArray = [];

@@ -10,7 +10,7 @@
         </div>
       </div>
       <div class="flex flex-col items-center">
-        <span class="text-sm text-gray-600">{{ getData().sensor_location?.location.name }}</span>
+        <span class="text-sm text-gray-600">{{$t(getData().sensor_location?.location.name) }}</span>
       </div>
     </div>
     <div class="grid grid-cols-6 gap-1">

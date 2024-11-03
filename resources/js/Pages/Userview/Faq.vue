@@ -1,7 +1,7 @@
 <template>
   <UserLayout>
     <div
-      class="bg-[url('/images/supportheader.png')] bg-cover bg-center relative h-[400px] flex items-center justify-center"
+      class="bg-[url('/images/hero.png')] bg-cover bg-center relative h-[400px] flex items-center justify-center"
     >
       <div class="text-center z-10">
         <h1 class="mainheading font-bold">{{ $t('How Can We Help You?') }}</h1>

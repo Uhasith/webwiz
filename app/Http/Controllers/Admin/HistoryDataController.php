@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Service\Admin\HistoryDataService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class HistoryDataController extends Controller
 {
@@ -21,17 +22,22 @@ class HistoryDataController extends Controller
         $this->historyDataService = $historyDataService;
     }
 
-    public function uploadExcel(Request $request)
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @throws BadRequestException
+     */
+    public function uploadExcel(Request $request): JsonResponse
     {
-        Utility::log([], get_class());
         $requestData = [
             "equipmentId" => $request->equipment_id,
-            "locationId" => $request->location_id,
-            "file" => $request->file('file')
+            "locationId" => $request->location_id
         ];
+        Utility::log($requestData, get_class());
+        $requestData['file'] = $request->file('file');
 
-       $response = $this->historyDataService->uploadHistoryData($requestData);
-       return response()->json($response);
+        $response = $this->historyDataService->uploadHistoryData($requestData);
+        return response()->json($response);
 
     }
 
@@ -42,12 +48,13 @@ class HistoryDataController extends Controller
      */
     public function revertUploadedData(Request $request): JsonResponse
     {
-        Utility::log([], get_class());
         $requestData = [
             "equipmentId" => $request->equipment_id,
-            "locationId" => $request->location_id,
-            "file" => $request->file('file')
+            "locationId" => $request->location_id
         ];
+        Utility::log($requestData, get_class());
+        $requestData['file'] = $request->file('file');
+
         $response = $this->historyDataService->revertUploadedData($requestData);
         return response()->json($response);
 

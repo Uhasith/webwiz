@@ -1,123 +1,209 @@
-<template>
-  <Transition name="modal">
-    <div v-if="show" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" @click="$emit('close')"></div>
-
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-medium leading-6" id="modal-title">
-                Edit User
-              </h3>
-              <button @click="$emit('close')" class="text-gray-400 hover:text-gray-500">
-                <span class="sr-only">Close</span>
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <form>
-              <div class="mb-4">
-                <label for="role" class="block text-sm font-medium text-gray-700">Select Role</label>
-                <select id="role" v-model="userData.role_id" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none sm:text-sm rounded-3xl">
-                    <option v-for="(key,role) in roles" :key="key" :value="key">{{ role }}</option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label for="username" class="block text-sm font-medium text-gray-700">User Name</label>
-              <input type="text" id="username" v-model="userData.name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-3xl" placeholder="Enter username...">
-              </div>
-              <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" id="email" v-model="userData.email" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-3xl" placeholder="Enter email...">
-              </div>
-              <div class="mb-4">
-                <label for="contact" class="block text-sm font-medium text-gray-700">Contact Number</label>
-                <input type="tel" id="contact" v-model="userData.contact" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-3xl" placeholder="Enter contact number...">
-            </div>
-              <div class="mb-4">
-                <label for="location" class="block text-sm font-medium text-gray-700">Status</label>
-                <select id="location" v-model="userData.status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none   sm:text-sm rounded-3xl">
-                  <option value="ACTIVE">ACTIVE</option>
-                  <option value="INACTIVE">INACTIVE</option>
-                </select>
-              </div>
-            </form>
-          </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-            <button type="button"  @click="submitForm" class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-6 py-1 bg-green1 text-base font-medium text-white hover:bg-green1  sm:ml-3 sm:w-auto sm:text-sm">
-              Save
-            </button>
-            <button type="button" class="mt-3 w-full inline-flex justify-center rounded-3xl border border-gray-300 shadow-sm px-6 py-1 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2  sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="$emit('close')">
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </Transition>
-  </template>
-
 <script setup>
-import { defineProps, defineEmits } from 'vue';
-import { onMounted, onUnmounted } from 'vue';
-import { ref, watch } from 'vue';
+import axios from 'axios';
+import { ref, onMounted, watch } from 'vue';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
+import { useForm } from 'vee-validate';
+import * as yup from 'yup';
+import { toast } from 'vue-sonner';
+import { useGlobalStore } from '@/store/global';
+import { Loader2 } from 'lucide-vue-next';
 
-const props = defineProps({
-  show: Boolean,
-  user: Object,
-  roles: Array
-});
-const emit = defineEmits(['close', 'saveUser']);
-const userData = ref({ ...props.user });
+const globalStore = useGlobalStore();
+
+const isLoading = ref(false);
+const showEditUserModal = defineModel('showEditUserModal');
+const selectedUser = defineModel('selectedUser');
+const selectedUserId = defineModel('selectedUserId');
+const organizations = ref([]);
 const roles = ref([]);
 
-watch(() => props.user, (newValue) => {
-  userData.value = { ...newValue };
-  if (!userData.value.role_id && newValue.roles && newValue.roles.length) {
-    userData.value.role_id = newValue.roles[0].id;
-  }
+onMounted(async () => {
+  roles.value = await getRoles();
+  organizations.value = await getOrgnizations();
 });
+
+const getOrgnizations = async () => {
+  const response = await axios.get('/admin/get-organization');
+  return response.data;
+};
 
 const getRoles = async () => {
   const response = await axios.get('/admin/get-roles');
   return response.data;
 };
 
-onMounted(async () => {
-    roles.value = await getRoles();
+const { errors, handleSubmit, defineField, resetForm, setFieldError, setValues } = useForm({
+  validationSchema: yup.object({
+    organization_id: yup
+      .number()
+      .required('Organization is required'),
+    role_id: yup
+      .number()
+      .required('Role is required'),
+    username: yup
+      .string()
+      .required('Username is required')
+      .min(4, 'The user name must be 4 to 20 characters long (min 4 max 20 characters)')
+      .max(20, 'The user name must be 4 to 20 characters long (min 4 max 20 characters)')
+      .matches(/^[a-zA-Z0-9_-]+$/, 'The user name is invalid (Allow only letters, numbers, underscore, and dash)'),
+    email: yup
+      .string()
+      .required('Email is required')
+      .email('Enter a valid email address'),
+    contact: yup
+      .string()
+      .required('The contact number is required')
+      .matches(/^[+0-9]+$/, 'The contact number is invalid (allow only numeric values and + symbol)')
+      .min(6, 'The contact number must be between 6 and 15 characters long')
+      .max(15, 'The contact number must be between 6 and 15 characters long')
+  }),
+  initialValues: {
+    organization_id: null,
+    role_id: null,
+    username: null,
+    email: null,
+    contact: null
+  },
 });
 
-const submitForm = () => {
-  updateUser();
-  emit('close');
+const [organization_id, organizationIdAttrs] = defineField('organization_id');
+const [role_id, roleIdAttrs] = defineField('role_id');
+const [username, userNameAttrs] = defineField('username');
+const [email, emailAttrs] = defineField('email');
+const [contact, contactAttrs] = defineField('contact');
 
-};
+// Watch the selectedSensor value and update the form values
+watch(selectedUser, (newValue) => {
+  setValues({
+    role_id: (newValue?.roles && newValue.roles.length > 0) ? newValue.roles[0].id : null,
+    organization_id: (newValue?.user_organizations && newValue.user_organizations.length > 0) ? newValue.user_organizations[0].organization_id : null,
+    username: newValue?.name || null,
+    email: newValue?.email || null,
+    contact: newValue?.contact || null,
+    data: newValue,
+  });
+});
 
-const updateUser = async () => {
-  try {
-    console.log("user data: ",  userData.value);
-    const response = await axios.put(`/admin/user-management/${userData.value.id}`, userData.value);
-    console.log('User updated successfully:', response.data);
-    emit ('reloadTable');
-  } catch (error) {
-    console.error('Error updating user:', error);
+watch(showEditUserModal, () => {
+  if (!showEditUserModal.value) {
+    resetForm();
   }
-};
+});
 
+const onSubmit = handleSubmit((values) => {
+  console.log(values);
+
+  isLoading.value = true;
+
+  const data = {
+    ...values
+  };
+
+  axios.put(route('user.update', selectedUserId.value), data)
+    .then(response => {
+      globalStore.refreshTableAction();
+      resetForm();
+      showEditUserModal.value = false;
+      toast.success('User updated', {
+        description: 'User updated successfully.',
+      });
+    })
+    .catch(error => {
+      console.error(error.response.data);
+      toast.error('Failed to update user', {
+        description: 'Please contact support if this error persists.',
+      });
+    }).finally(() => {
+      isLoading.value = false;
+    });
+});
 </script>
 
-<style scoped>
-.modal-enter-active,
-.modal-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-</style>
+<template>
+  <Dialog v-model:open="showEditUserModal">
+    <DialogContent class="sm:max-w-xl grid-rows-[auto_minmax(0,1fr)_auto] p-0 max-h-[80dvh]"
+      @interactOutside="(e) => e.preventDefault()">
+      <DialogHeader class="p-6 pb-0">
+        <DialogTitle>Edit User Form</DialogTitle>
+      </DialogHeader>
+      <div class="grid gap-4 py-4 overflow-y-auto px-6">
+        <div class="flex flex-col justify-between">
+          <form id="create-user" @submit="onSubmit">
+            <div class="mb-4">
+              <label for="organization" class="block text-sm font-medium text-gray-700 mb-1">Select Organization</label>
+              <Select v-model="organization_id" v-bind="organizationIdAttrs">
+                <SelectTrigger class="w-full rounded-full">
+                  <SelectValue placeholder="Select a organization" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem v-for="organization in organizations" :key="organization.id" :value="organization.id">
+                      <div class="capitalize">
+                        {{ organization.name }}
+                      </div>
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <span v-if="errors.organization_id" class="text-red-500 text-sm">{{ errors.organization_id }}</span>
+            </div>
+            <div class="mb-4">
+              <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Select Role</label>
+              <Select v-model="role_id" v-bind="roleIdAttrs">
+                <SelectTrigger class="w-full rounded-full">
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem v-for="(key, role) in roles" :key="role" :value="parseInt(role, 10)">
+                      <div class="capitalize">
+                        {{ key }}
+                      </div>
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <span v-if="errors.role_id" class="text-red-500 text-sm">{{ errors.role_id }}</span>
+            </div>
+            <div class="mb-4">
+              <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+              <input v-model="username" v-bind="userNameAttrs" type="text" id="username"
+                class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-3xl" placeholder="Example: John">
+              <span v-if="errors.username" class="text-red-500 text-sm">{{ errors.username }}</span>
+            </div>
+            <div class="mb-4">
+              <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+              <input v-model="email" v-bind="emailAttrs" type="email" id="email" disabled
+                class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-3xl cursor-not-allowed bg-gray-100"
+                placeholder="Example: cea@example.com">
+              <span v-if="errors.email" class="text-red-500 text-sm">{{ errors.email }}</span>
+            </div>
+            <div class="mb-4">
+              <label for="contact" class="block text-sm font-medium text-gray-700">Contact Number</label>
+              <input v-model="contact" v-bind="contactAttrs" type="tel" id="contact"
+                class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-3xl"
+                placeholder="Example: +639123456789">
+              <span v-if="errors.contact" class="text-red-500 text-sm">{{ errors.contact }}</span>
+            </div>
+          </form>
+        </div>
+      </div>
+      <DialogFooter class="p-6 pt-0">
+        <div class="px-4 py-3 text-right">
+             <button form="create-user" type="submit" :disabled="isLoading"
+            class="bg-green-500 text-white rounded-3xl px-4 py-2"
+            :class="{ 'opacity-50 cursor-not-allowed': isLoading }">
+            <div class="flex items-center space-x-2">
+              <Loader2 v-show="isLoading" class="w-4 h-4 mr-2 animate-spin" />
+              Add
+            </div>
+          </button>
+          <button type="button" @click="showEditUserModal = false" :disabled="isLoading"
+            class="ml-3 bg-gray-300 text-gray-700 rounded-3xl px-4 py-2"
+            :class="{ 'opacity-50 cursor-not-allowed': isLoading }">Cancel</button>
+        </div>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</template>

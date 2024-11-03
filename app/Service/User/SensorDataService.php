@@ -9,6 +9,7 @@ use App\Repository\User\HourlySensorDataRepo;
 use App\Repository\User\MonthlySensorDataRepo;
 use App\Repository\User\SensorDataRepo;
 use App\Repository\User\WeeklySensorDataRepo;
+use Illuminate\Support\Facades\Log;
 
 class SensorDataService
 {
@@ -49,12 +50,18 @@ class SensorDataService
         $interval = $startTime->diff($endTime);
 
         if ($interval->days <= 1) {
-
+            $hourly = $this->hourlySensorRepo->getSensorData($locationId, $equipmentId, $startTime, $endTime);
+            if (sizeof($hourly) > 0) {
+                return [
+                    "type" => "hourly",
+                    "result" => $this->hourlySensorRepo->getSensorData($locationId, $equipmentId, $startTime, $endTime)
+                ];
+            }
+            $today = $this->sensorDataRepo->getSensorData($locationId, $equipmentId, false, false, $startTime, $endTime);
             return [
-                "type" => "hourly",
-                "result" => $this->hourlySensorRepo->getSensorData($locationId, $equipmentId, $startTime, $endTime)
+                "type" => "today",
+                "result" => $today
             ];
-
         } elseif ($interval->days <= 7) {
 
             $daily = $this->dailySensorRepo->getSensorData($locationId, $equipmentId, $startTime, $endTime);

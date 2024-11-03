@@ -3,14 +3,17 @@ import { ref, onMounted, onUnmounted, defineEmits } from 'vue';
 import EditSensorData from '../Models/EditSensorData.vue';
 import SuccessAlert from '@/Components/SuccessAlert.vue';
 import ErrorAlert from '@/Components/ErrorAlert.vue';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/Components/ui/dialog';
 import { Button } from '@/Components/ui/button';
 import { reset } from '@/Utils/Alert';
 import { useGlobalStore } from '@/store/global';
 import axios from 'axios';
 import { toast } from 'vue-sonner';
+import useAuth from "@/Utils/useAuth";
 
 const globalStore = useGlobalStore();
+
+const { hasPermission } = useAuth();
 
 const props = defineProps({
   itemId: {
@@ -25,6 +28,7 @@ const emit = defineEmits(['dataDeleted', 'dataNotDeleted', 'dataUpdated']);
 
 const isOpen = ref(false);
 const showConfirmDelete = ref(false);
+const showConfirmStatusChange = ref(false);
 const selectedSensor = ref(null);
 const selectedSensorId = ref(props.itemId);
 const status = ref(props.status);
@@ -67,13 +71,18 @@ const editSensorData = () => {
 };
 
 const statusChangeConfirm = (status) => {
-  showConfirmDelete.value = true;
+  showConfirmStatusChange.value = true;
   selectedStatus.value = status;
 };
 
 const confirmStatusUpdate = () => {
-  showConfirmDelete.value = false;
+  showConfirmStatusChange.value = false;
   statusUpdate(selectedStatus.value);
+};
+
+const confirmDelete = () => {
+  showConfirmDelete.value = false;
+  deleteData();
 };
 
 const statusUpdate = async (changedStatus) => {
@@ -100,17 +109,17 @@ const statusUpdate = async (changedStatus) => {
 
 const deleteData = async () => {
   try {
-    const response = await axios.delete(`/admin/data-management/${props.itemId}`);
-    console.log('Data deleted successfully:', response.data);
-    emit('dataDeleted');
-    successMessage.value = "The data has been successfully removed."
-    resetMessages();
+    const response = await axios.delete(route('sensor.data.delete', selectedSensorId.value));
+    globalStore.refreshTableAction();
+    toast.success('Sensor Data Deleted', {
+      description: 'Sensor data deleted successfully.',
+    });
 
   } catch (error) {
-    console.log(error);
-    errorMessage.value = "Something went wrong, the item could not be removed."
-    resetMessages();
-
+    console.error(error);
+    toast.error('Failed to update sensor data status', {
+      description: 'Please contact support if this error persists.',
+    });
   }
 };
 </script>
@@ -132,7 +141,7 @@ const deleteData = async () => {
     <div v-if="isOpen"
       class="font-medium origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
       <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-        <button @click="editSensorData()"
+        <button @click="editSensorData()" v-if="hasPermission('Update Sensor Data')"
           class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
           Edit Data
         </button>
@@ -140,12 +149,28 @@ const deleteData = async () => {
           class="block w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-100 hover:text-green-900">Activate</button>
         <button v-else @click="statusChangeConfirm('INACTIVE')"
           class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900">Inactivate</button>
-        <button @click="deleteData()"
+        <button @click="showConfirmDelete = true" v-if="hasPermission('Update Sensor Data')"
           class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100 hover:text-red-900">Archive
           Data</button>
       </div>
     </div>
   </div>
+  <Dialog v-model:open="showConfirmStatusChange">
+    <DialogContent class="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>Are you sure?</DialogTitle>
+        <DialogDescription> You will not be able to undo this action. </DialogDescription>
+      </DialogHeader>
+      <div class="flex items-center justify-end gap-4">
+        <Button variant="secondary" @click="showConfirmStatusChange = false;">
+          Cancel
+        </Button>
+        <Button @click="confirmStatusUpdate()">
+          Yes
+        </Button>
+      </div>
+    </DialogContent>
+  </Dialog>
   <Dialog v-model:open="showConfirmDelete">
     <DialogContent class="sm:max-w-md">
       <DialogHeader>
@@ -156,7 +181,7 @@ const deleteData = async () => {
         <Button variant="secondary" @click="showConfirmDelete = false;">
           Cancel
         </Button>
-        <Button @click="confirmStatusUpdate()">
+        <Button @click="confirmDelete()">
           Yes
         </Button>
       </div>

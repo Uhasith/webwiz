@@ -59,21 +59,15 @@ class WeatherRecords extends Model
     public static function formatWeatherData(array $data, $sensor_data_id): array
     {
         $id = Uuid::generate() . "";
+        $formattedWeatherData = Utility::weatherDataFormat($data,$data['sensor_location_id']);
 
-        return [
+        return array_merge($formattedWeatherData,[
             'id' => $id,
-            'sensor_location_id' => $data['sensorLocationId'],
-            'status' => Utility::$statusActive,
-            'humidity' => $data['humidity']??null,
-            'wind' => $data['wind']??null,
-            'pressure' => $data['pressure']??null,
-            'temperature' => $data['temperature']??null,
-            'cloud' => $data['cloud']??null,
-            'precipitation' => $data['precipitation']??null,
             'sensor_data_id'=>$sensor_data_id,
+            'status' => Utility::$statusActive,
             'created_at' => $data['created_at']??Carbon::now(),
             'updated_at' => $data['updated_at']?? Carbon::now()
-        ];
+        ]);
     }
 
 
@@ -89,7 +83,7 @@ class WeatherRecords extends Model
 
         return [
             'id' => $id,
-            'sensor_location_id' => $data['sensorLocationId'],
+            'sensor_location_id' => $data['sensor_location_id'],
             'status' => Utility::$statusActive,
             'humidity' => $data['humidity']??null,
             'wind' => $data['wind']??null,

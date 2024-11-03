@@ -1,11 +1,17 @@
 <script setup>
-import AppLayout from "@/Layouts/AppLayout.vue";
-import Welcome from "@/Components/Welcome.vue";
+import { onMounted } from "vue";
 import AdminUserDropdown from "@/Components/Custom/Dropdowns/AdminUserDropdown.vue";
 import { Link, usePage } from "@inertiajs/vue3";
 import { Toaster } from '@/Components/ui/sonner';
+import useAuth from "@/Utils/useAuth";
+import axios from 'axios';
 
 const page = usePage();
+const { hasPermission } = useAuth();
+
+onMounted(() => {
+  axios.defaults.headers.common['X-CSRF-TOKEN'] = page.props.csrf_token || '';
+});
 
 const isActive = (paths) => {
   // Ensure paths is an array
@@ -62,7 +68,7 @@ const isActive = (paths) => {
             </Link>
           </li>
 
-          <li>
+          <li v-if="hasPermission('View Sub Admin')">
             <Link href="/admin/dashboard/user-management" :class="[
                 isActive(['/admin/dashboard/user-management'])
                   ? 'bg-green1 text-white'
@@ -73,7 +79,7 @@ const isActive = (paths) => {
             <span class="text-md">User Management</span>
             </Link>
           </li>
-          <li>
+          <li v-if="hasPermission('View Sensor Data')">
             <Link href="/admin/dashboard/data-management" :class="[
                 isActive(['/admin/dashboard/data-management'])
                   ? 'bg-green1 text-white'
@@ -84,6 +90,17 @@ const isActive = (paths) => {
             <span class="text-md">Data Management</span>
             </Link>
           </li>
+            <li v-if="hasPermission('View Sensor Data')">
+                <Link href="/admin/dashboard/historical-data" :class="[
+                isActive(['/admin/dashboard/historical-data'])
+                  ? 'bg-green1 text-white'
+                  : 'text-gray-700',
+                'flex items-center px-2 py-3 space-x-2 rounded-full cursor-pointer',
+              ]">
+                    <img src="/images/data-history.svg" alt="Centered Image" class="" />
+                    <span class="text-md">Historical Data</span>
+                </Link>
+            </li>
           <li>
             <Link href="/admin/dashboard/equipments" :class="[
                 isActive(['/admin/dashboard/equipments'])

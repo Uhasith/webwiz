@@ -7,10 +7,11 @@
         </div> -->
 
     <div
-      class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white border border-gray-200 overflow-hidden sm:rounded-lg"
+    class="w-full sm:max-w-md lg:max-w-[650px] min-h-[700px] lg:max-h-[700px] overflow-y-auto  px-6 py-4 bg-white border border-gray-200 sm:rounded-lg"
+    
     >
       <div class="text-center">
-        <img src="/images/logo.png" alt="Centered Image" class="mx-auto h-12" />
+        <img src="/images/logo.png" alt="Centered Image" class="mx-auto h-12 mt-4" />
         <h1 class="text text-4xl font-semibold mt-4">Log in to your account</h1>
         <p class="mt-1 font-bold text-gray-500">
           Welcome back! Please enter your details.

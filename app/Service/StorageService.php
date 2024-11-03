@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Storage;
 class StorageService
 {
 
+    /**
+     * @param $file
+     * @param $path
+     * @return bool|int
+     */
     public static function storeLocally($file, $path): bool|int
     {
         $path = storage_path("app/" . $path);
@@ -33,6 +38,10 @@ class StorageService
         return Storage::put($path, $fileContents);
     }
 
+    /**
+     * @param $path
+     * @return bool
+     */
     public static function removeLocalFile($path): bool
     {
         $localPath = storage_path("app/" . $path);

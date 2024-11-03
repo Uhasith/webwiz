@@ -75,4 +75,16 @@ class MonthlySensorData extends Model
     {
         return $this->hasOne('App\ModelsV2\MonthlyWeatherData','monthly_sensor_data_id');
     }
+
+    // Direct relationship to Location through SensorLocation
+    public function location()
+    {
+        return $this->hasOneThrough(Locations::class, SensorLocations::class, 'id', 'id', 'sensor_location_id', 'location_id');
+    }
+
+    // Direct relationship to Sensor through SensorLocation
+    public function sensor()
+    {
+        return $this->hasOneThrough(Sensors::class, SensorLocations::class, 'id', 'id', 'sensor_location_id', 'sensor_id');
+    }
 }

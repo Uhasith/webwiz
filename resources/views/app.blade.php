@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">-->
+
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#007bff">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -46,7 +48,7 @@
     </style>
 </head>
 
-<body class="font-sans antialiased">
+<body class="font-sans antialiased" style="width:100%;min-width: 100%">
     <noscript>
         <div class="noscript-container">
             <div class="noscript-message">

@@ -19,7 +19,7 @@ class RoleController extends Controller
 
     public function getRoles()
     {
-        $roles = Role::all()->pluck('id', 'name');
+        $roles = Role::all()->pluck('name', 'id');
         return response()->json($roles);
     }
     
@@ -29,7 +29,8 @@ class RoleController extends Controller
             $data = $request->only(['role_name', 'permissions']);
             $this->userManagementService->createRole($data);
             $rolesWithPermissions = Role::select('id', 'name')->with('permissions')->orderBy('id')->get();
-            return response()->json(['status' => 'success', 'message' => 'Role created successfully', 'rolesWithPermissions' => $rolesWithPermissions], 200);
+            $roles = Role::all()->pluck('name', 'id');
+            return response()->json(['status' => 'success', 'message' => 'Role created successfully', 'rolesWithPermissions' => $rolesWithPermissions, 'roles' => $roles], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -53,7 +54,8 @@ class RoleController extends Controller
         try {
             $this->userManagementService->deleteRole($roleId);
             $rolesWithPermissions = Role::select('id', 'name')->with('permissions')->get();
-            return response()->json(['status' => 'success', 'message' => 'Role deleted successfully', 'rolesWithPermissions' => $rolesWithPermissions], 200);
+            $roles = Role::all()->pluck('name', 'id');
+            return response()->json(['status' => 'success', 'message' => 'Role deleted successfully', 'rolesWithPermissions' => $rolesWithPermissions, 'roles' => $roles], 200);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

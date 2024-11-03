@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Jetstream\HasProfilePhoto;
 use Spatie\Permission\Traits\HasRoles;
@@ -101,5 +102,16 @@ class User extends Authenticatable
     public function userOrganizations()
     {
         return $this->hasMany('App\ModelsV2\UserOrganization', 'user_id');
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastLoginAtAttribute(): string
+    {
+        if(!$this->attributes['last_login_at']){
+            return "";
+        }
+        return Carbon::createFromFormat('Y-m-d H:i:s', $this->attributes['last_login_at'])->diffForHumans();
     }
 }

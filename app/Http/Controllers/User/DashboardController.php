@@ -49,7 +49,6 @@ class DashboardController extends Controller
 
     public function index()
     {
-        Utility::log([],get_class());
         $equipmentTypes = $this->sensorsService->homepageService();
         $sensors = $this->sensorsService->getSensorsByEquipmentId('all');
 
@@ -97,14 +96,14 @@ class DashboardController extends Controller
         $requestData = [
             'sensorIds' => $request['sensorIds'] ?? [],
             'equipmentIds' => $request['equipmentIds'] ?? [],
-            'sensorLocationId' => $request['sensorLocationId'] ?? null,
+            'sensor_location_id' => $request['sensorLocationId'] ?? null,
             'ranking' => $request['ranking'] ?? null,
         ];
         Utility::log($requestData,get_class());
 
 
-        $data = $this->sensorDataService->getRecentData($requestData['sensorIds'], $requestData['equipmentIds'], $requestData['sensorLocationId'],$requestData['ranking']);
-        $defaultData = $this->sensorDataService->getDefaultLocationRecentData($requestData['sensorIds'], $requestData['equipmentIds'], $requestData['sensorLocationId']);
+        $data = $this->sensorDataService->getRecentData($requestData['sensorIds'], $requestData['equipmentIds'], $requestData['sensor_location_id'],$requestData['ranking']);
+        $defaultData = $this->sensorDataService->getDefaultLocationRecentData($requestData['sensorIds'], $requestData['equipmentIds'], $requestData['sensor_location_id']);
 
 
         return response()->json([
@@ -122,28 +121,6 @@ class DashboardController extends Controller
 
         $trendData = $this->sensorsService->get24HTrendData($requestData['sensor_location_id']);
         return response()->json($trendData);
-    }
-
-
-    public function airQualityData(Request $request)
-    {
-        $data = [
-            'sensor_location_id' => $request->sensor_location_id,
-            'PM2.5' => $request->pm2_5,
-            'PM10' => $request->pm10,
-            'O3' => $request->o3,
-            'CO' => $request->co,
-            'NO2' => $request->no2,
-            'SO2' => $request->so2,
-            'CO2' => $request->co2,
-            'temperature'=>$request->temperature,
-            'humidity'=> $request->humidity,
-        ];
-
-        Utility::log($data,get_class());
-
-        $sensorData = $this->sensorDataService->saveSensorData($data);
-        return response()->json($sensorData);
     }
 
     public function getSensorsByLocationId($locationId)
@@ -167,33 +144,13 @@ class DashboardController extends Controller
             'locationId' => $request->locationId,
             'equipmentId' => $request->equipmentId,
             'timeStart' => $request->startTime ? Carbon::parse(Utility::convertLocalToUtc($request->startTime.' 00:00:00',Utility::$sriLankaTimeZone)) : null,
-            'timeEnd' => $request->endTime ? Carbon::parse(Utility::convertLocalToUtc($request->endTime.' 00:00:00',Utility::$sriLankaTimeZone)) : null,
+            'timeEnd' => $request->endTime ? Carbon::parse(Utility::convertLocalToUtc($request->endTime.' 23:59:59',Utility::$sriLankaTimeZone)) : null,
         ];
 
         Utility::log($requestData,get_class());
 
         $data = $this->sensorDataService->getSensorData($requestData['locationId'], $requestData['equipmentId'], $requestData['timeStart'], $requestData['timeEnd']);
         return response()->json($data);
-    }
-
-
-    //temporary save weather records api
-    public function saveTempWeather($sensorLocationId, Request $request)
-    {
-
-        $data = [
-            'sensorLocationId' => $sensorLocationId,
-            'sensorDataId'=>$sensorDataId,
-            'temperature' => $request->temperature,
-            'pressure' => $request->pressure,
-            'humidity' => $request->humidity,
-            'cloud' => $request->cloud,
-            'wind' => $request->wind,
-        ];
-
-        Utility::log($data,get_class());
-        $weather = $this->weatherService->saveTempWeather($data,$data['sensorDataId']);
-        return response()->json($weather);
     }
 
     public function citiesWithProvince(Request $request)

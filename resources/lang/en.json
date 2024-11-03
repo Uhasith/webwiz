@@ -65,5 +65,10 @@
     "This application provides real-time air quality monitoring across various locations in Sri Lanka. It offers a detailed analysis of air pollutant parameters and comparative analysis between different locations": "This application provides real-time air quality monitoring across various locations in Sri Lanka. It offers a detailed analysis of air pollutant parameters and comparative analysis between different locations",
     "How is the Air Quality Index (AQI) measured?": "How is the Air Quality Index (AQI) measured?",
     "What technologies are used in this application?": "What technologies are used in this application?",
-    "How often is the data updated?": "How often is the data updated?"
+    "How often is the data updated?": "How often is the data updated?",
+
+    "Battaramulla":"Battaramulla",
+    "Maharagama":"Maharagama",
+    "Galle":"Galle",
+    "Kandy":"Kandy"
 }

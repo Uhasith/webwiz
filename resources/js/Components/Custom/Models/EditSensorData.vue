@@ -174,7 +174,8 @@ const onSubmit = handleSubmit((values) => {
 
 <template>
   <Dialog v-model:open="show">
-    <DialogContent class="sm:max-w-xl grid-rows-[auto_minmax(0,1fr)_auto] p-0 max-h-[80dvh]">
+    <DialogContent class="sm:max-w-xl grid-rows-[auto_minmax(0,1fr)_auto] p-0 max-h-[80dvh]"
+      @interactOutside="(e) => e.preventDefault()">
       <DialogHeader class="p-6 pb-0">
         <DialogTitle>Edit Data</DialogTitle>
       </DialogHeader>

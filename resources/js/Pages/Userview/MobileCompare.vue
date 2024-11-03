@@ -398,7 +398,7 @@
 
           <hr class="my-4" />
 
-          <Chart1 />
+          <Chart1 style="overflow-x: scroll" />
           <p class="w-full text-center text-xs text-gray-500 mt-3">
             {{ $t("Last Update") }}: 01 July 2024, 08.25 AM
           </p>
@@ -426,7 +426,7 @@
 
           <hr class="my-4" />
 
-          <Chart4 />
+          <Chart4 style="overflow-x: scroll"  />
         </div>
       </div>
     </div>

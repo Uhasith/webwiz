@@ -60,21 +60,15 @@ class MonthlyWeatherData extends Model{
     public static function formatWeatherData(array $data, $monthly_sensor_data_id ): array
     {
         $id = Uuid::generate() . "";
+        $formattedWeatherData = Utility::weatherDataFormat($data,$data['sensor_location_id']);
 
-        return [
+        return array_merge($formattedWeatherData,[
             'id' => $id,
-            'sensor_location_id' => $data['sensorLocationId'],
-            'status' => Utility::$statusActive,
-            'humidity' => $data['humidity']??null,
-            'wind' => $data['wind']??null,
-            'pressure' => $data['pressure']??null,
-            'temperature' => $data['temperature']??null,
-            'cloud' => $data['cloud']??null,
-            'precipitation' => $data['precipitation']??null,
             'monthly_sensor_data_id'=> $monthly_sensor_data_id,
+            'status' => $data['status'] ?? Utility::$statusActive,
             'created_at' => $data['created_at']  ?? Carbon::now()->subHour()->endOfHour(),
-            'updated_at' => $data['created_at'] ?? Carbon::now()->subHour()->endOfHour()
-        ];
+            'updated_at' => $data['updated_at'] ?? Carbon::now()->subHour()->endOfHour()
+        ]);
     }
 
 

@@ -65,5 +65,11 @@
     "This application provides real-time air quality monitoring across various locations in Sri Lanka. It offers a detailed analysis of air pollutant parameters and comparative analysis between different locations": "இந்த பயன்பாடு இலங்கையின் பல்வேறு இடங்களில் நிகழ்நேர காற்றின் தர கண்காணிப்பை வழங்குகிறது. இது காற்று மாசுபடுத்தும் அளவுருக்கள் பற்றிய விரிவான பகுப்பாய்வு மற்றும் வெவ்வேறு இடங்களுக்கு இடையே ஒப்பீட்டு பகுப்பாய்வு ஆகியவற்றை வழங்குகிறது",
     "How is the Air Quality Index (AQI) measured?": "காற்றின் தரக் குறியீடு (AQI) எவ்வாறு அளவிடப்படுகிறது?",
     "What technologies are used in this application?": "இந்த பயன்பாட்டில் பயன்படுத்தப்படும் தொழில்நுட்பங்கள் என்ன?",
-    "How often is the data updated?": "தரவுகள் எவ்வளவு அடிக்கடி புதுப்பிக்கப்படுகின்றன?"
+    "How often is the data updated?": "தரவுகள் எவ்வளவு அடிக்கடி புதுப்பிக்கப்படுகின்றன?",
+
+    
+    "Battaramulla":"பத்தரமுல்ல",
+    "Maharagama":"மஹரகம",
+    "Galle":"காலி",
+    "Kandy":"கண்டி"
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="mt-8 historical_data px-4 lg:px-0">
-    <h1 class="text-2xl md:text-[2.8rem] font-bold">
+    <h1 class="text-2xl md:text-[2.8rem] font-bold mb-4">
       {{ $t("Historical Data") }}
     </h1>
     <p class="text-md md:mt-2">
@@ -19,7 +19,7 @@
             icon="/images/greenpinicon.png"
           /> -->
         </div>
-        <div class="md:flex md:items-top">
+        <div class="mt-4 md:mt-0 md:flex md:items-top ">
           <!-- <TimeperiodDropdown /> -->
           <TimeRangePicker />
         </div>
@@ -72,7 +72,7 @@
               @click="showDropdown3 = !showDropdown3"
             />
           </div>
-          <div class="lg:flex lg:space-x-2" :class="{ hidden: !showDropdown3 }">
+          <div class="lg:flex lg:space-x-2 " :class="{ hidden: !showDropdown3 }">
             <div class="mb-2"><SelectParameterDropdown ui="historical" @selectionChanged="handleSelectionChange"/></div>
             <div class="mb-2"><MeasuredByDropdown ui="pm-chart" :sensors="locationSensors" /></div>
           </div>

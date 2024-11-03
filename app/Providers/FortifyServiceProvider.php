@@ -15,6 +15,8 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -49,6 +51,12 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::authenticateUsing(function (Request $request) {
             $user = User::where('email', $request->email)->first();
 
+            if (!$user) {
+                throw ValidationException::withMessages([
+                    'general' => 'This email is not associated with a user account',
+                ]);
+            }
+
             if ($user && Hash::check($request->password, $user->password)) {
                 $user->last_login_at = now();
                 Session::put("CURRENT_USER_ID",$user->id);
@@ -57,8 +65,12 @@ class FortifyServiceProvider extends ServiceProvider
 
                 return $user;
             }
+            else{
+                throw ValidationException::withMessages([
+                    'general' => 'Invalid email or password',
+                ]);
+            }
 
-            return null;
         });
     }
 }

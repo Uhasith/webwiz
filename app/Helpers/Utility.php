@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Support\Facades\Session;
+use InvalidArgumentException;
 
 class Utility
 {
@@ -24,13 +25,18 @@ class Utility
     public static string $user = "user";
     public static string $minute = "minute";
     public static string $hour = "hour";
+    public static string $daily = "daily";
+    public static string $weekly = "weekly";
+    public static string $monthly = "monthly";
+    public static string $annually = "annually";
     public static string $history = "history";
     public static string $typeSystem = "SYSTEM";
     public static string $typeManual = "MANUAL";
     public static array $cloudConditions = ['cloudy', 'sunny', 'rainy', 'partly cloudy'];
 
     public static array $ecoTechStatus = [128, 64, 0];
-    public static int $ecoTechExcelColumnCount = 22;
+    public static int $ecoTechExcelColumnCount = 18;
+    public static int $iqAirExcelColumnCount = 58;
     public static string $sriLankaTimeZone = 'Asia/Colombo';
 
 
@@ -82,27 +88,27 @@ class Utility
         }
 
         if (isset($data["PM2.5"])) {
-            $pm2_5_status = ($data["PM2.5"] < 0 || $data["PM2.5"] > 500) ? self::$statusPending : $pm2_5_status;
+            $pm2_5_status = ($data["PM2.5"] <= 0 || $data["PM2.5"] > 400.37) ? self::$statusPending : $pm2_5_status;
         }
 
         if (isset($data["PM10"])) {
-            $pm10_status = ($data["PM10"] < 0 || $data["PM10"] > 600) ? self::$statusPending : $pm10_status;
+            $pm10_status = ($data["PM10"] <= 0 || $data["PM10"] > 650.49) ? self::$statusPending : $pm10_status;
         }
 
         if (isset($data["NO2"])) {
-            $no2_status = ($data["NO2"] < 0 || $data["NO2"] > 1000) ? self::$statusPending : $no2_status;
+            $no2_status = ($data["NO2"] <= 0 || $data["NO2"] > 2001.87) ? self::$statusPending : $no2_status;
         }
 
         if (isset($data["SO2"])) {
-            $so2_status = ($data["SO2"] < 0 || $data["SO2"] > 1000) ? self::$statusPending : $so2_status;
+            $so2_status = ($data["SO2"] <= 0 || $data["SO2"] > 1000.99) ? self::$statusPending : $so2_status;
         }
 
         if (isset($data["O3"])) {
-            $o3_status = ($data["O3"] < 0 || $data["O3"] > 500) ? self::$statusPending : $o3_status;
+            $o3_status = ($data["O3"] <= 0 || $data["O3"] > 600.49) ? self::$statusPending : $o3_status;
         }
 
         if (isset($data["CO"])) {
-            $co_status = ($data["CO"] < 0 || $data["CO"] > 50000) ? self::$statusPending : $co_status;
+            $co_status = ($data["CO"] <= 0 || $data["CO"] > 50049) ? self::$statusPending : $co_status;
         }
 
 
@@ -244,7 +250,7 @@ class Utility
         }
 
         return [
-            "sensorLocationId" => $locationId,
+            "sensor_location_id" => $locationId,
             'temperature' => $countTemperature > 0 ? $sumTemperature / $countTemperature : 0,
             'pressure' => $countPressure > 0 ? $sumPressure / $countPressure : 0,
             'humidity' => $countHumidity > 0 ? $sumHumidity / $countHumidity : 0,
@@ -380,11 +386,29 @@ class Utility
     /**
      * @throws \Exception
      */
-    public static function convertLocalTimeStampToUtc($localDate,$localZone): string
+    public static function convertLocalTimeStampToUtc($localDate): string
     {
-        $dateTime = new DateTime( gmdate("Y-m-d H:i:s", ($localDate - 25569) * 86400), new DateTimeZone($localZone));
-        return ($dateTime->setTimezone(new DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+        $dateString = gmdate("Y-m-d H:i:s", ($localDate - 25569) * 86400);
+        $dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $dateString, new DateTimeZone('UTC'));
 
+        return self::convertLocalToUtc($dateTime->format('Y-m-d H:i:s'),Utility::$sriLankaTimeZone);
+    }
+
+    public static function excelDateToCarbon($excelDate): bool|Carbon
+    {
+        if(!$excelDate || !is_numeric($excelDate)){
+            throw new InvalidArgumentException("Invalid period start time found in array: $excelDate");
+        }
+        $date = Carbon::create(1899, 12, 30)->addDays($excelDate);
+
+        $daysPart = floor($excelDate ?? 0);
+        $timeFraction = $excelDate - $daysPart;
+
+        if ($timeFraction > 0) {
+            $date->addSeconds($timeFraction * 86400); // 86400 seconds in a day
+        }
+
+        return $date;
     }
 
     /**
@@ -428,7 +452,7 @@ class Utility
     public static function formatOptionalData(array $data, $id, $type = null): array
     {
         $format = [
-            'sensor_location_id' => $data['sensorLocationId'] ?? null,
+            'sensor_location_id' => $data['sensor_location_id'] ?? null,
             'status' => Utility::$statusActive,
             'at' => $data['at'] ?? null,
             'rh' => $data['rh'] ?? null,
@@ -548,17 +572,17 @@ class Utility
     {
         return  [
             "sensor_location_id" => $sensorLocationId,
-            "PM2.5" => $data['PM2.5 Conc'],
-            "PM10" => $data['PM10 Conc'],
-            "CO" => $data['CO Conc'],
-            "O3" => $data['O3 Conc'],
-            "NO2" => $data['NO2 Conc'],
-            "SO2" => $data['SO2 Conc'],
-            "CO2" => null,
-            "temperature" => null,
-            "humidity" => null,
-            "PM1" => null,
-            "PM100" => null,
+            "PM2.5" => $data['PM2.5 Conc'] ?? $data['PM2.5'] ?? null,
+            "PM10" => $data['PM10 Conc'] ?? $data['PM10'] ?? null,
+            "CO" => $data['CO Conc'] ?? $data['CO'] ?? null,
+            "O3" => $data['O3 Conc'] ?? $data['O3'] ?? null,
+            "NO2" => $data['NO2 Conc'] ?? $data['NO2'] ?? null,
+            "SO2" => $data['SO2 Conc'] ?? $data['SO2'] ?? null,
+            "CO2" => $data['CO2 Conc'] ?? $data['CO2'] ?? null,
+            "PM1" => $data['PM1 Conc'] ?? $data['PM1'] ?? null,
+            "PM100" => $data['PM100 Conc'] ?? $data['PM100'] ?? null,
+            "temperature" => $data['Temperature'] ?? null,
+            "humidity" => $data['Humidity'] ?? null,
             "created_at" => $data['created_at'],
             "updated_at" => $data['updated_at'],
             "identifier" => $identifier
@@ -573,14 +597,22 @@ class Utility
      */
     public static function weatherDataFormat($data, $sensorLocationId, $identifier = null): array
     {
+
+        self::validateNumericArray([
+            $data['Rain Gauge'] ?? $data['precipitation'] ?? null,
+            $data['WS Average'] ?? $data['WS Raw'] ?? $data['wind'] ?? $data['Fan Speed'] ?? $data['Wind Speed'] ?? null,
+            $data['Temperature'] ?? $data['temperature'] ?? null,
+            $data['Pressure'] ?? $data['pressure'] ?? $data['BP'] ?? null,
+            $data['Humidity'] ?? $data['humidity'] ?? null
+        ]);
         return  [
-            "sensorLocationId" => $sensorLocationId,
-            "precipitation" => $data['Rain Gauge'], // TODO:: NEED TO CONFIRM
-            "wind" => $data['WS Raw'], // TODO:: NEED TO CONFIRM
-            "temperature" => null, // TODO:: NEED TO CONFIRM
-            "pressure" => null, // TODO:: NEED TO CONFIRM
-            "humidity" => null, // TODO:: NEED TO CONFIRM
-            "cloud" => null, // TODO:: NEED TO CONFIRM
+            "sensor_location_id" => $sensorLocationId,
+            "precipitation" => $data['Rain Gauge'] ?? $data['precipitation'] ?? null, // TODO:: NEED TO CONFIRM
+            "wind" => $data['WS Average'] ?? $data['WS Raw'] ?? $data['wind'] ?? $data['Fan Speed'] ?? $data['Wind Speed'] ?? null, // TODO:: NEED TO CONFIRM
+            "temperature" => $data['Temperature'] ?? $data['temperature'] ?? null, // TODO:: NEED TO CONFIRM
+            "pressure" => $data['Pressure'] ?? $data['pressure'] ?? $data['BP'] ?? null, // TODO:: NEED TO CONFIRM
+            "humidity" => $data['Humidity'] ?? $data['humidity'] ?? null, // TODO:: NEED TO CONFIRM
+            "cloud" => $data['Cloud'] ?? $data['cloud'] ?? null, // TODO:: NEED TO CONFIRM
             "created_at" => $data['created_at'],
             "updated_at" => $data['updated_at']
         ];
@@ -594,11 +626,25 @@ class Utility
      */
     public static function optionalDataFormat($data, $sensorLocationId, $identifier = null): array
     {
+        self::validateNumericArray([
+            $data['AT'] ?? null,
+            $data['BP'] ?? null,
+            $data['RH'] ?? null,
+            $data['Solar Rad'] ?? null,
+            $data['Rain Gauge'] ?? null,
+            $data['WS Raw'] ?? null,
+            $data['WD Raw'] ?? null,
+            $data['WS Average'] ?? null,
+            $data['WD Average'] ?? null,
+            $data['NO Conc'] ?? null,
+            $data['VOC'] ?? null,
+            $data['NOx Conc'] ?? null
+        ]);
         return [
-            'sensorLocationId' => $sensorLocationId,
+            'sensor_location_id' => $sensorLocationId,
             'at' => $data['AT'] ?? null,
-            'bp' => $data['RH'] ?? null,
-            'rh' => $data['BP'] ?? null,
+            'bp' => $data['BP'] ?? null,
+            'rh' => $data['RH'] ?? null,
             'solar_rad' => $data['Solar Rad'] ?? null,
             'rain_gauge' => $data['Rain Gauge'] ?? null,
             'ws_raw' => $data['WS Raw'] ?? null,
@@ -606,10 +652,25 @@ class Utility
             'ws_average' => $data['WS Average'] ?? null,
             'wd_average' => $data['WD Average'] ?? null,
             'no' => $data['NO Conc'] ?? null,
+            'voc' => $data['VOC'] ?? null,
             'nox' => $data['NOx Conc'] ?? null,
             "created_at" => $data['created_at'],
             "updated_at" => $data['updated_at'],
             "identifier" => $identifier,
         ];
+    }
+
+    /**
+     * @param $array
+     * @return void
+     */
+    public static function validateNumericArray($array): void
+    {
+        $nonNumericValues = array_filter($array, fn($value) => !is_null($value) && !is_numeric($value));
+
+        if (!empty($nonNumericValues)) {
+            $values = implode(", ", $nonNumericValues);
+            throw new InvalidArgumentException("Non-numeric values found in array: $values");
+        }
     }
 }

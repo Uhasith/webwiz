@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import Checkbox from '@/Components/Checkbox.vue';
@@ -8,12 +8,15 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 
+const page = usePage();
+
 const form = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
     terms: false,
+    _token: page.props.csrf_token,
 });
 
 const submit = () => {

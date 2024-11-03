@@ -26,6 +26,8 @@ const props = defineProps({
   equipmentTypes: Object,
   sensors: Object,
   province: Object,
+    filteredDataCount: Number,
+    lastUpdatedDate: String,
 });
 
 const globalStore = useGlobalStore();
@@ -34,6 +36,8 @@ let numberOfPages = 0; // To store the number of pages
 const sensorData = ref({ data: [], total_count: 0, active_count: 0 });
 const selectedEquipmentType = ref("");
 const typeFilteredSensors = ref(props.sensors);
+const filteredDataCount = ref(props.filteredDataCount);
+const lastUpdatedDate = ref(props.lastUpdatedDate);
 const SelectFilteredSensors = ref("");
 const typeFilteredProvince = ref("");
 const selectProvince = ref("");
@@ -132,33 +136,41 @@ watch(() => globalStore.refreshTable, (newValue) => {
 });
 
 async function handleEquipmentTypeChange(newType) {
-  selectedEquipmentType.value = newType.id;
-  SelectFilteredSensors.value = "";
-  typeFilteredProvince.value = "";
-  if (selectedEquipmentType.value != '') {
-    await axios
-      .get(`/sensors/${newType.id}`)
-      .then((response) => {
-        typeFilteredSensors.value = response.data;
-      })
-      .catch((error) => {
-        console.error("Error fetching sensors:", error);
-      });
-  }
+    selectedEquipmentType.value = newType.id;
+    SelectFilteredSensors.value = "";
+    typeFilteredProvince.value = "";
+    if (selectedEquipmentType.value !== '') {
+        await axios
+            .get(`/sensors/${newType.id}`)
+            .then((response) => {
+                typeFilteredSensors.value = response.data;
+                handleTypeChanged({'id':''})
+            })
+            .catch((error) => {
+                console.error("Error fetching sensors:", error);
+            });
+    }
 }
 
 async function handleTypeChanged(newType) {
-  SelectFilteredSensors.value = newType.id;
-  if (SelectFilteredSensors.value != '' && selectedEquipmentType.value != '') {
+    SelectFilteredSensors.value = newType.id;
+    let equipmentType = selectedEquipmentType.value;
+    let sensorId = newType.id;
+    if(SelectFilteredSensors.value === ''){
+        sensorId = "all";
+    }
+    if(selectedEquipmentType.value === ''){
+        equipmentType = "all";
+    }
     await axios
-      .get(`/admin/location/${selectedEquipmentType.value}/${newType.id}`)
-      .then((response) => {
-        typeFilteredProvince.value = response.data;
-      })
-      .catch((error) => {
-        console.error("Error fetching sensors:", error);
-      });
-  }
+        .get(`/admin/location/${equipmentType}/${sensorId}`)
+        .then((response) => {
+            typeFilteredProvince.value = response.data;
+        })
+        .catch((error) => {
+            console.error("Error fetching sensors:", error);
+        });
+
 }
 
 function handlerprovinceChanged(newType) {
@@ -253,7 +265,9 @@ const initializeDataTable = () => {
       },
       dataSrc: function (json) {
         numberOfPages = json.numberOfPages;
-        updatePaginationUI(numberOfPages);
+          filteredDataCount.value = json.filteredDataCount;
+          lastUpdatedDate.value = json.lastUpdatedDate;
+          updatePaginationUI(numberOfPages);
         return json.data; // Standard data return for DataTables
       }
     },
@@ -272,8 +286,11 @@ const initializeDataTable = () => {
       { data: "co", name: "co" },
       { data: "no2", name: "no2" },
       { data: "so2", name: "so2" },
-      { data: null, render: function () { return "N/A"; } },
-      { data: "co2", name: "co2" },
+        { data: "temperature", name: "temperature" },
+        { data: "pressure", name: "pressure" },
+        { data: "wind", name: "wind" },
+        { data: "humidity", name: "humidity" },
+        { data: "precipitation", name: "precipitation" },
       {
         data: "status",
         name: "status",
@@ -315,7 +332,7 @@ const initializeDataTable = () => {
         const container = document.getElementById(`dropdown-container-${rowData.id}`);
         if (container) {
           const app = createApp(AdminDataMgmentDropdown, {
-            itemId: rowData.id, 
+            itemId: rowData.id,
             status: rowData.status
           });
           app.mount(container);
@@ -324,7 +341,7 @@ const initializeDataTable = () => {
     },
 
     createdRow: function (row, data, dataIndex) {
-      $("td", row).addClass("border-b border-gray-200 custpadding");
+      $("td", row).addClass("border-b border-gray-200 custpadding text-sm");
     },
   });
 };
@@ -437,7 +454,8 @@ const exportSensorsData = async () => {
 <template>
   <AdminLayout>
     <AddDataModel :show="showAddDataModel" @close="showAddDataModel = false" />
-    <div class="p-4">
+    <div style="overscroll-behavior-x: none;
+    overflow-x: hidden;" class="p-4">
       <div v-if=successMessage class="fixed top-4 right-4">
         <SuccessAlert :value="successMessage" />
       </div>
@@ -455,9 +473,9 @@ const exportSensorsData = async () => {
             <div class="ml-3">
               <div class="text-sm font-semibold">Total Data Entries</div>
               <div class="text-xs mt-2">
-                Last Update: 01 July 2024, 08:25 AM
+                Last Update: {{ formatDate(lastUpdatedDate) }}
               </div>
-              <div class="mt-3 text-3xl font-bold">{{ sensorData.total_count }}</div>
+              <div class="mt-3 text-3xl font-bold">{{filteredDataCount }}</div>
             </div>
           </div>
         </div>
@@ -482,7 +500,7 @@ const exportSensorsData = async () => {
       <div class="flex space-x-4 mt-7">
         <EquipmentDropdown side="left" :equipment-types="equipmentTypes" @type-changed="handleEquipmentTypeChange" />
         <MeasuredByDropdown :sensors="typeFilteredSensors" @sensorChanged="handleTypeChanged" />
-        <ProvinceDropdown :province="typeFilteredProvince" @provinceChanged="handlerprovinceChanged"
+        <ProvinceDropdown ui="data-management" :province="typeFilteredProvince" @provinceChanged="handlerprovinceChanged"
           color="text-green-700" icon="/images/greenpinicon.png" />
 
       </div>
@@ -691,6 +709,9 @@ const exportSensorsData = async () => {
                     <SelectItem value="INACTIVE">
                       Inactive
                     </SelectItem>
+                      <SelectItem value="PENDING">
+                          Pending
+                      </SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -738,12 +759,12 @@ const exportSensorsData = async () => {
             Export Data
           </button>
           <div class="relative inline-block text-left">
-            <div>
-              <button @click="toggleDropdown" type="button" class="px-4 ml-4 py-2 bg-green1 text-white rounded-full"
-                id="options-menu" aria-haspopup="true" aria-expanded="true">
-                + Add New Data
-              </button>
-            </div>
+<!--            <div>-->
+<!--              <button @click="toggleDropdown" type="button" class="px-4 ml-4 py-2 bg-green1 text-white rounded-full"-->
+<!--                id="options-menu" aria-haspopup="true" aria-expanded="true">-->
+<!--                + Add New Data-->
+<!--              </button>-->
+<!--            </div>-->
 
             <div v-if="isOpen"
               class="font-medium origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
@@ -764,20 +785,23 @@ const exportSensorsData = async () => {
         </div>
       </div>
 
-      <div class="container mx-auto my-4">
+      <div class="container mx-auto my-4 overflow-x-auto">
         <table class="min-w-full bg-white ctable" id="data-table">
           <thead>
-            <tr class="w-full text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-              <th class="py-3 px-4">Date & Time</th>
+            <tr class="w-full text-left text-sm text-gray-400 tracking-wider">
+              <th class="py-3 px-4" style="min-width: 100px">Date & Time</th>
               <th class="py-3 px-4">Location</th>
-              <th class="py-3 px-4">PM2.5</th>
-              <th class="py-3 px-4">PM10</th>
-              <th class="py-3 px-4">O3</th>
-              <th class="py-3 px-4">CO</th>
-              <th class="py-3 px-4">NO2</th>
-              <th class="py-3 px-4">SO2</th>
-              <th class="py-3 px-4">VOC</th>
-              <th class="py-3 px-4">CO2</th>
+              <th class="py-3 px-4">PM2.5(μg/m³)</th>
+              <th class="py-3 px-4">PM10(μg/m³)</th>
+              <th class="py-3 px-4">O3(ppb)</th>
+              <th class="py-3 px-4">CO(ppb)</th>
+              <th class="py-3 px-4">NO2(ppb)</th>
+              <th class="py-3 px-4">SO2(ppb)</th>
+                <th class="py-3 px-4">Temp(°C)</th>
+                <th class="py-3 px-4">Pressure(mb)</th>
+                <th class="py-3 px-4">Wind(km/h)</th>
+                <th class="py-3 px-4">Humidity(%)</th>
+                <th class="py-3 px-4">Rain(mm)</th>
               <th class="py-3 px-4">Status</th>
               <th class="py-3 px-4"></th>
             </tr>
@@ -810,7 +834,7 @@ const exportSensorsData = async () => {
     </div>
 
     <!-- Pagination -->
-    <div class="flex items-center justify-between w-full mt-4">
+    <div class="flex items-center justify-between w-full mt-4 p-5">
       <button @click="previousPage" class="px-4 py-1 rounded-lg border border-gray-300">
         Previous
       </button>

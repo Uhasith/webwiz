@@ -28,13 +28,13 @@ class Kernel extends ConsoleKernel
     {
         Log::info('Schedule is starting.');
         $schedule->command('app:five-minute-command')->everyFiveMinutes();
+        $schedule->command('app:send-notifications-command')->everyFiveMinutes();
         $schedule->command('app:fifteen-minute-command')->everyFifteenMinutes();
         $schedule->command('app:hourly-command')->hourlyAt($minutes = 0);
-        $schedule->command('app:daily-command')->dailyAt('00:00');
-        $schedule->command('app:weekly-command')->weekly()->at('00:00');
-        $schedule->command('app:monthly-command')->monthly()->at('00:00');
-        $schedule->command('app:annually-command')->yearly()->at('00:00');
-        $schedule->command('app:send-notifications-command')->everyFiveMinutes();
+        $schedule->command('app:daily-command')->dailyAt('00:01');
+        $schedule->command('app:weekly-command')->weekly()->at('00:02');
+        $schedule->command('app:monthly-command')->monthly()->at('00:03');
+        $schedule->command('app:annually-command')->yearly()->at('00:04');
 
     }
 

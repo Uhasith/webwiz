@@ -16,13 +16,12 @@ class EquipmentFactory
         $sensorRepo = new SensorsRepo();
         $weatherRecordsRepo = new WeatherRecordsRepo();
         $sensorLocationRepo = new SensorLocationRepo();
-    
+
         $weatherService = new WeatherService($weatherRecordsRepo,$sensorLocationRepo);
         if (env("EQUIPMENT_MOCK")) {
             Log::info("Equipment Mock Enabled");
             return new EquipmentMockService($sensorRepo);
         }
-        Log::info("Equipment Service Enabled");
         return new EquipmentService($sensorRepo,$weatherService);
     }
 }

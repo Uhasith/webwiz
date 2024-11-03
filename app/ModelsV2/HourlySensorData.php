@@ -2,9 +2,10 @@
 
 namespace App\ModelsV2;
 
+use App\Models\SensorLocation;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property integer $id
@@ -48,7 +49,7 @@ class HourlySensorData extends Model
         'no2_aqi' => 'array',
         'so2_aqi' => 'array',
         'co2_aqi' => 'array',
-        'aqi'=>'array'
+        'aqi' => 'array'
     ];
 
     protected $keyType = 'string';
@@ -67,13 +68,12 @@ class HourlySensorData extends Model
         return $this->belongsTo('App\ModelsV2\SensorLocations');
     }
 
-
     /**
      * @return HasOne
      */
     public function weatherRecords(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasOne('App\ModelsV2\HourlyWeatherData','hourly_sensor_data_id');
+        return $this->hasOne('App\ModelsV2\HourlyWeatherData', 'hourly_sensor_data_id');
     }
 
     /**
@@ -81,8 +81,18 @@ class HourlySensorData extends Model
      */
     public function hourlyWeatherData(): HasOne
     {
-        return $this->hasOne('App\ModelsV2\HourlyWeatherData','hourly_sensor_data_id');
+        return $this->hasOne('App\ModelsV2\HourlyWeatherData', 'hourly_sensor_data_id');
     }
 
+    // Direct relationship to Location through SensorLocation
+    public function location()
+    {
+        return $this->hasOneThrough(Locations::class, SensorLocations::class, 'id', 'id', 'sensor_location_id', 'location_id');
+    }
 
+    // Direct relationship to Sensor through SensorLocation
+    public function sensor()
+    {
+        return $this->hasOneThrough(Sensors::class, SensorLocations::class, 'id', 'id', 'sensor_location_id', 'sensor_id');
+    }
 }

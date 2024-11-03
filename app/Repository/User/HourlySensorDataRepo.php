@@ -33,7 +33,7 @@ class HourlySensorDataRepo
         $sensorData->save();
     }
 
-    public function getSensorData($locationId, $equipmentId, $startTime,  $endTime)
+    public function getSensorData($locationId, $equipmentId, $startTime,  $endTime = null)
     {
 
         return HourlySensorData::whereHas('sensorLocation', function ($query) use ($locationId,$equipmentId) {

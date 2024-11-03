@@ -1,14 +1,14 @@
 {
-    "Dashboard": "ඩැශ්බෝර්ඩ්",
+    "Dashboard": "පුවරුව",
     "About Us": "අපි ගැන",
-    "FAQ": "FAQ",
+    "FAQ": "නිතර අසනු ලබන ප්‍රශ්ණ",
     "AQI - SL": "AQI - SL",
     "AQI - US": "AQI - US",
     "Login": "Login",
-    "Air Quality Monitoring Dashboard": "Air Quality Monitoring Dashboard",
+    "Air Quality Monitoring Dashboard": "වායු ගුණාත්මකතා නිරීක්ෂණ පුවරුව",
     "Real-Time Air Quality Data and Insights at Your Fingertips": "වාතයේ සජීවී ගුණාත්මක දත්ත",
     "Sri Lanka": "ශ්‍රී ලංකා",
-    "Western Province, Colombo": "Colombo, Western Province",
+    "Western Province, Colombo": "කොළඹ, බස්නාහිර පළාත",
     "Air Quality Index Scale": "වායු ගුණාත්මක දර්ශකය",
     "All": "සියල්ල",
     "Good": "හොඳයි",
@@ -65,5 +65,10 @@
     "This application provides real-time air quality monitoring across various locations in Sri Lanka. It offers a detailed analysis of air pollutant parameters and comparative analysis between different locations": "මෙම යෙදුම ශ්‍රී ලංකාවේ විවිධ ස්ථාන හරහා තත්‍ය කාලීන වායු තත්ත්ව අධීක්‍ෂණය සපයයි. එය වායු දූෂක පරාමිතීන් පිළිබඳ සවිස්තරාත්මක විශ්ලේෂණයක් සහ විවිධ ස්ථාන අතර සංසන්දනාත්මක විශ්ලේෂණයක් ඉදිරිපත් කරයි.",
     "How is the Air Quality Index (AQI) measured?": "වායු තත්ත්ව දර්ශකය (AQI) මනිනු ලබන්නේ කෙසේද?",
     "What technologies are used in this application?": "මෙම යෙදුමේ භාවිතා කරන තාක්ෂණයන් මොනවාද?",
-    "How often is the data updated?": "දත්ත කොපමණ වාරයක් යාවත්කාලීන වේද?"
+    "How often is the data updated?": "දත්ත කොපමණ වාරයක් යාවත්කාලීන වේද?",
+
+    "Battaramulla":"බත්තරමුල්ල",
+    "Maharagama":"මහරගම",
+    "Galle":"ගාල්ල",
+    "Kandy":"මහනුවර"
 }

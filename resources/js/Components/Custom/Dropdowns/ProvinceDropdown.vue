@@ -24,7 +24,7 @@
     <!-- Dropdown menu -->
     <div
       v-if="dropdownOpen"
-      class="origin-top-right z-[2001] absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+      class="max-h-[35dvh] overflow-y-auto origin-top-right z-[2001] absolute mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
       role="menu"
       aria-orientation="vertical"
       aria-labelledby="menu-button"
@@ -64,6 +64,7 @@ import axios from 'axios';
 const props = defineProps({
   color: String,
   icon: String,
+    ui: String,
   province: {
     type: [String, Number, Array], // Allow Array if you want to pass pre-loaded provinces
     default: null,
@@ -76,7 +77,7 @@ const emit = defineEmits(['provinceChanged']);
 // State variables
 const dropdownOpen = ref(false);
 const provinces = ref([]);
-const selectedProvinceName = ref('Select Province');
+const selectedProvinceName = ref('Select Location');
 const dropdownContainer = ref(null);  // Correctly defined dropdownContainer ref
 
 // Function to toggle dropdown visibility
@@ -95,20 +96,18 @@ function changeSelection(province) {
 async function fetchProvinces() {
   let url = '/public/sensor-locations';
   try {
-    if (props.province == "") {
+    if (props.province === "") {
       const response = await axios.get(url);
-      console.log(url);
-
       provinces.value = response.data;
     } else {
       provinces.value = props.province;  // Use preloaded provinces if passed as prop
     }
 
     // Set default province to 'All' if there's no province and provinces are available
-    if (!props.province || props.province === 'all') {
+    // if (!props.province || props.province === 'all') {
       selectedProvinceName.value = 'All';
       emit('provinceChanged', { id: 'all', name: 'All' });
-    }
+    // }
   } catch (error) {
     console.error('Error fetching provinces:', error);
   }
@@ -129,7 +128,9 @@ function closeDropdown(event) {
 // Lifecycle hooks
 onMounted(() => {
   document.addEventListener('click', closeDropdown);
-  fetchProvinces(); // Fetch initial data on mount
+  if(props.ui !== 'bulk' && props.ui !== 'historical'&& props.ui !== 'data-management' ){
+      fetchProvinces();
+  }
 });
 
 onUnmounted(() => {

@@ -115,14 +115,14 @@
               @click="applyFilters"
               class="w-full inline-flex justify-center rounded-3xl border border-transparent shadow-sm px-6 py-1 bg-green1 text-base font-medium text-white hover:bg-green1 sm:ml-3 sm:w-auto sm:text-sm"
             >
-              Apply Filters
+              Set Filters
             </button>
             <button
               type="button"
               class="mt-3 w-full inline-flex justify-center rounded-3xl border border-gray-300 shadow-sm px-6 py-1 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
               @click="$emit('close')"
             >
-              Cancel
+              Clear
             </button>
           </div>
         </div>

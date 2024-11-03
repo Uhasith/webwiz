@@ -8,7 +8,7 @@ import {
     modifyDate,
     getDaysByDate,
     getWeeksByDate,
-    getMonthsByDate, getYearByDate
+    getMonthsByDate, getYearByDate, getMinutesWithHoursWithAMPM
 } from "@/Utils/LastUpdate.js";
 import getMapData from "@/Services/getMapData.js";
 import getMapDataService from "@/Services/getMapData.js";
@@ -66,6 +66,9 @@ async function getHistoricalData() {
                 let createdAts = data.result.map(item => item.created_at);
                 emit('history-update-date', createdAts[createdAts.length - 1]);
                 let aqis = data.result.map(item => item.aqi.AQI);
+                if (data.type === "today") {
+                    displayChart(Math.ceil(Math.max(...aqis.map(Number)) / 100) * 100, getMinutesWithHoursWithAMPM(createdAts), aqis);
+                }
                 if (data.type === "hourly") {
                     displayChart(Math.ceil(Math.max(...aqis.map(Number)) / 100) * 100, getHoursWithAMPM(createdAts), aqis);
                 }
@@ -177,8 +180,9 @@ const config = {
     type: "line",
     data: aqiData,
     options: {
-        responsive: false,
+        responsive: true,
         maintainAspectRatio: false,
+
         scales: {
             y: {
                 beginAtZero: true,
@@ -188,6 +192,9 @@ const config = {
                 grid: {
                     display: false,
                 },
+                ticks: {
+                    maxTicksLimit: 30 // Adjust to limit the number of labels shown
+                }
             },
         },
         plugins: {

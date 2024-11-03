@@ -7,7 +7,7 @@ import FiltersModel from "@/Components/Custom/Models/FiltersModel.vue";
 import AdminUserMgmentDropdown from "@/Components/Custom/Dropdowns/AdminUserMgmentDropdown.vue";
 import SuccessAlert from "@/Components/SuccessAlert.vue";
 import ErrorAlert from "@/Components/ErrorAlert.vue";
-import { onMounted, ref, watch, nextTick, createApp } from "vue";
+import { onMounted, ref, watch, nextTick, createApp, computed } from "vue";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/Components/ui/accordion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
@@ -16,15 +16,21 @@ import { Switch } from '@/Components/ui/switch';
 import { toast } from 'vue-sonner';
 import { usePage } from '@inertiajs/vue3';
 import { debounce } from "lodash";
+import { useGlobalStore } from '@/store/global';
+import useAuth from "@/Utils/useAuth";
 import axios from 'axios';
 
 const page = usePage();
 const props = defineProps({ rolesWithPermissions: Array, groupedPermissions: Array, roles: Array });
+const { hasPermission } = useAuth();
+
+const globalStore = useGlobalStore();
 
 const roles = ref(props.roles);
 const groupedPermissions = ref(props.groupedPermissions);
 const rolesWithPermissions = ref(props.rolesWithPermissions);
 const checkedStatus = ref({});
+const hasUsers = ref(true);
 
 const showAddUserModal = ref(false);
 const showAddRoleModal = ref(false);
@@ -41,11 +47,20 @@ const selectedRoles = ref([]);
 const dataTable = ref(null);
 const searchQuery = ref("");
 
-const tabs = [{ name: "User Lists" }, { name: "User Permissions" }];
+const tabs = ref([{ name: "User Lists" }]);
 const currentTab = ref("User Lists");
 
+
+// Conditionally add "User Permissions" tab if user has 'View Permission'
+if (hasPermission('View Permission')) {
+    tabs.value.push({ name: "User Permissions" });
+}
+
+const filteredRoles = computed(() => {
+    return rolesWithPermissions.value.filter(role => role.name !== 'superadmin');
+});
+
 onMounted(() => {
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = page.props.csrf_token || '';
     initializeToggles();
     loadScript("https://code.jquery.com/jquery-3.6.0.min.js")
         .then(() => loadScript("https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"))
@@ -61,6 +76,11 @@ watch(showConfirmDelete, (newValue, oldValue) => {
         showConfirmDelete.value = false;
         deleteRoleId.value = null;
     }
+});
+
+// Reload the table when the refreshTable event is emitted
+watch(() => globalStore.refreshTable, (newValue) => {
+    reloadTable();
 });
 
 const initializeToggles = () => {
@@ -102,6 +122,7 @@ const deleteRoleInBackend = async (roleId) => {
     await axios.delete(route('role.destroy', roleId)).then((res) => {
         if (res.data.status === 'success') {
             rolesWithPermissions.value = res.data.rolesWithPermissions;
+            roles.value = res.data.roles;
             showConfirmDelete.value = false;
             toast.success('Role Deleted', {
                 description: 'Role deleted successfully.',
@@ -109,6 +130,12 @@ const deleteRoleInBackend = async (roleId) => {
         }
     }).catch((error) => {
         console.error("Failed to delete role:", error);
+        if (error.response && error.response.data && error.response.data?.error === 'Role has associated users') {
+            toast.error('This role cannot be deleted', {
+                description: 'There are users assigned to it. Please unassign all users from this role before proceeding with deletion',
+            });
+            return;
+        }
         toast.error('Failed to delete role', {
             description: 'Please contact support if this error persists.',
         });
@@ -167,12 +194,21 @@ const initializeDataTable = () => {
                 d.roles = selectedRoles.value;
                 d.search = searchQuery.value;
             },
+
+           
+            
         },
         columns: [
             { data: "name", name: "name" },
             { data: "roles", name: "roles" },
             { data: "email", name: "email" },
             { data: "contact", name: "contact" },
+            {
+                data: "status", name: "status", render: function (data) {
+                    return data === 'PENDING' ? '<span style="color: orange;">Pending</span>'
+                        : data === 'ACTIVE' ? '<span style="color: #019301;">Active</span>' : '<span style="color: red;">Inactive</span>';
+                }
+            },
             // { data: null, render: function() { return "Colombo"; }},
             {
                 data: "last_login_at", name: "last_login_at", render: function (data) {
@@ -191,6 +227,8 @@ const initializeDataTable = () => {
                 next: "Next",
             },
             info: "Page _PAGE_ of _PAGES_",
+            emptyTable: "No data available in table"
+        
         },
         dom: "rt",
         pagingType: "simple",
@@ -204,6 +242,8 @@ const initializeDataTable = () => {
         drawCallback: function (settings) {
             var api = this.api();
             var pageInfo = api.page.info();
+            hasUsers.value = api.rows().count() > 0;
+
             $(".dataTables_info").html(
                 "Page " + (pageInfo.page + 1) + " of " + pageInfo.pages
             );
@@ -216,18 +256,13 @@ const initializeDataTable = () => {
                 if (container) {
                     const app = createApp(AdminUserMgmentDropdown, {
                         itemId: rowData.id,
+                        status: rowData.status,
+                        data: rowData
                     });
-                    app.component('AdminUserMgmentDropdown',
-                        {
-                            methods: {
-                                dataDeleted() {
-                                    reloadTable();
-                                }
-                            }
-                        });
                     app.mount(container);
                 }
             });
+          
         },
         createdRow: function (row, data, dataIndex) {
             $("td", row).addClass("border-b border-gray-200 custpadding");
@@ -341,10 +376,10 @@ const exportUsers = async () => {
 
 <template>
     <AdminLayout>
-        <AddUserModel :show="showAddUserModal" v-model:roles="roles"
+        <AddUserModel v-model:showAddUserModal="showAddUserModal" v-model:roles="roles"
             @close="(message) => { showAddUserModal = false; successMessage = message; }" />
         <AddRoleModel v-model:showAddRoleModal="showAddRoleModal" v-model:groupedPermissions="groupedPermissions"
-            v-model:rolesWithPermissions="rolesWithPermissions" />
+            v-model:rolesWithPermissions="rolesWithPermissions" v-model:roles="roles" />
         <EditUserModel @reloadTable="reloadTable" />
         <FiltersModel :show="showFiltersModal" @close="showFiltersModal = false" :availableRoles="roles"
             @applyFilters="handleApplyFilters" :initialSelectedRoles="selectedRoles" />
@@ -393,16 +428,16 @@ const exportUsers = async () => {
                                             d="M21 21l-4.35-4.35m3.23-4.88a6.375 6.375 0 11-12.75 0 6.375 6.375 0 0112.75 0z" />
                                     </svg>
                                 </div>
-                                <div class="ml-4 flex items-center">
+                                <div class="ml-4 flex-shrink-0 items-center">
                                     <button @click="showFiltersModal = true"
                                         class="flex items-center px-6 py-2 border border-gray-300 rounded-full text-green-700 font-semibold">
                                         <img src="/images/filterlinesicon.svg" alt="Filter Icon" class="w-4 h-4 mr-2" />
                                         filters
                                     </button>
                                 </div>
-                                <div class="ml-4 flex items-center">
+                                <div class="ml-4 flex items-center flex-wrap ">
                                     <button v-for="role in selectedRoles" :key="role"
-                                        class="flex items-center px-4 py-2 bg-green-50 rounded-full text-green-700 font-semibold mr-2">
+                                        class="flex items-center px-4 py-2 bg-green-50 rounded-full text-green-700 font-semibold mr-2 mb-2 mt-2">
                                         <span>{{ role }}</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor" @click.stop="removeRole(role)">
@@ -413,16 +448,18 @@ const exportUsers = async () => {
                                 </div>
                             </div>
                             <div class="flex items-center">
-                                <button @click="exportUsers"
-                                    class="flex items-center px-6 py-2 border border-gray-300 rounded-full text-green-700 font-semibold">
-                                    <img src="/images/exportdataicon.svg" alt="Filter Icon" class="w-4 h-4 mr-2" />
+                                <button 
+                                    @click="exportUsers" :disabled="!hasUsers"
+                                    class="flex items-center justify-center w-40 h-10 border border-gray-300 rounded-full text-green-700 font-semibold text-center truncate hover:bg-green-100 transition duration-200 ease-in-out">
+                                    <img src="/images/exportdataicon.svg" alt="Export Icon" class="w-4 h-4 mr-2" />
                                     Export Data
                                 </button>
-                                <button @click="showAddUserModal = true"
-                                    class="px-4 ml-4 py-2 bg-green1 text-white rounded-full">
+                                <button v-if="hasPermission('Create Sub Admin')" @click="showAddUserModal = true"
+                                    class="w-40 h-10 ml-4 bg-green1 text-white rounded-full text-center truncate">
                                     + Add New User
                                 </button>
                             </div>
+
                         </div>
 
                         <!-- Table -->
@@ -430,15 +467,16 @@ const exportUsers = async () => {
                             <table id="users-table" class="min-w-full">
                                 <thead>
                                     <tr
-                                        class="w-full text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                        class="w-full text-left text-sm  text-gray-400 font-medium  tracking-wider">
                                         <th class="py-3 px-6 flex items-center">
                                             <img src="/images/checkboxicon.svg" alt="Icon" class="mr-2 w-4 h-4" />
-                                            <span>User Name</span>
+                                            <span>Username</span>
                                         </th>
                                         <th class="py-3 px-6">Roles</th>
                                         <th class="py-3 px-6">Email</th>
                                         <th class="py-3 px-6">Contact Number</th>
                                         <!-- <th class="py-3 px-6">Location</th> -->
+                                        <th class="py-3 px-6">Status</th>
                                         <th class="py-3 px-6">Last Login</th>
                                         <th class="py-3 px-6"></th>
                                     </tr>
@@ -474,7 +512,7 @@ const exportUsers = async () => {
                     <div v-else-if="currentTab === 'User Permissions'">
                         <!-- User Permissions content -->
                         <div class="flex justify-end">
-                            <button @click="showAddRoleModal = true"
+                            <button v-if="hasPermission('Create Role')" @click="showAddRoleModal = true"
                                 class="px-4 py-2 bg-green1 text-white rounded-full">
                                 + Add New Role
                             </button>
@@ -485,11 +523,11 @@ const exportUsers = async () => {
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
-                            <div v-for="(role, roleIndex) in rolesWithPermissions" :key="role.id" class="col-span-1">
+                            <div v-for="(role, roleIndex) in filteredRoles" :key="role.id" class="col-span-1">
                                 <div class="bg-white border border-gray-200 rounded-lg p-4 mb-4">
                                     <div class="flex justify-between items-center">
                                         <h3 class="text-md capitalize font-semibold">{{ role.name }}</h3>
-                                        <DropdownMenu>
+                                        <DropdownMenu v-if="hasPermission('Update Role')">
                                             <DropdownMenuTrigger>
                                                 <div class="text-md cursor-pointer font-bold p-4">&#8942;</div>
                                             </DropdownMenuTrigger>
@@ -510,6 +548,7 @@ const exportUsers = async () => {
                                                     <p class="text-sm">{{ item.name }}</p>
 
                                                     <Switch v-model:checked="checkedStatus[role.id][category][item.id]"
+                                                        :disabled="!hasPermission('Update Permission')"
                                                         @update:checked="togglePermission(role.id, category, item.id)" />
                                                 </div>
                                             </AccordionContent>
@@ -557,7 +596,7 @@ table.dataTable.no-footer {
 .custpadding {
     padding-top: 0.75rem !important;
     padding-bottom: 0.75rem !important;
-    padding-left: 1.5rem !important;
+    padding-left: 1.1rem !important;
     padding-right: 1.5rem !important;
 }
 </style>

@@ -16,7 +16,7 @@ const props = defineProps({
   disableOutsidePointerEvents: { type: Boolean, required: false },
   asChild: { type: Boolean, required: false },
   as: { type: null, required: false },
-  class: { type: null, required: false },
+  class: { type: null, required: false }
 });
 const emits = defineEmits([
   "escapeKeyDown",
@@ -25,6 +25,7 @@ const emits = defineEmits([
   "interactOutside",
   "openAutoFocus",
   "closeAutoFocus",
+    "closeModal"
 ]);
 
 const delegatedProps = computed(() => {
@@ -34,6 +35,10 @@ const delegatedProps = computed(() => {
 });
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
+function closeModal(){
+    emits("closeModal",true);
+    return "closed";
+}
 </script>
 
 <template>
@@ -49,7 +54,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       <DialogClose
         class="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
       >
-        <X class="w-4 h-4" />
+        <X class="w-4 h-4" :onclick="closeModal" />
         <span class="sr-only">Close</span>
       </DialogClose>
     </DialogContent>

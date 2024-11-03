@@ -7,7 +7,7 @@ const chartCanvas = ref(null);
 const props = defineProps({
     data: Object
 });
-const airQualityIndex = props.data?.aqi.AQI;
+const airQualityIndex = props.data?.aqi?.AQI;
 const airQualityIndexText = props.data?.aqi?.SL;
 const aqiData = {
   labels: [
@@ -135,14 +135,17 @@ const gaugeChartText = {
 
     // Adding background color, padding, and border radius for the 'Good' text
     const text = props.data?.aqi?.SL;
-    const padding = 5;
+    const paddingTop = 6;
+    const paddingBottom = 6;
+    const paddingLeftRight = 8;
     const borderRadius = 12;
     ctx.font = "13px sans-serif";
     const textWidth = ctx.measureText(text).width;
     const textHeight = parseInt(ctx.font, 10); // This will approximate the height of the text
-    const rectWidth = textWidth + padding * 12;
-    const rectHeight = textHeight + padding * 2;
+    const rectWidth = textWidth + paddingLeftRight * 2;
+    const rectHeight = textHeight + paddingTop + paddingBottom;
     ctx.fillStyle = colours(airQualityIndexText, true); // Background color
+
 
       // Function to draw rounded rectangle
     const drawRoundedRect = (x, y, width, height, radius) => {

@@ -1,6 +1,6 @@
 <template>
     <div class="mt-8 hidden lg:block comparative_analysis px-4 lg:px-0">
-        <h1 class="text-2xl md:text-[2.8rem] font-bold">
+        <h1 class="text-2xl md:text-[2.8rem] font-bold mb-4">
             {{ $t("Comparative Analysis") }}
         </h1>
         <p class="text-md mt-2">

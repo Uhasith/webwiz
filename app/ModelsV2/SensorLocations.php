@@ -23,9 +23,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class SensorLocations extends Model
 {
-    /**
-     * @var array
-     */
+    
+    protected $table = 'sensor_locations';
+    
     protected $fillable = ['sensor_id','latitude', 'longitude', 'location_id','locationindex', 'status', 'created_at', 'updated_at'];
 
     /**

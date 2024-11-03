@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-64">
+  <div class="relative w-80 md:w-72">
     <div class="flex items-center cursor-pointer" @click="openDropdown">
       <img
         src="/images/greenpinicon.png"
@@ -12,7 +12,7 @@
         @input="debouncedSearch"
         @focus="openDropdown"
         :placeholder="placeholder"
-        class="inputsearch text-[18px] md:text-base text-green-700 border-none bg-transparent box-shadow-none outline-none focus:border-none focus:box-shadow-none focus:outline-none cursor-pointer"
+        class="inputsearch w-full text-[18px] md:text-base text-green-700 border-none bg-transparent box-shadow-none outline-none focus:border-none focus:box-shadow-none focus:outline-none cursor-pointer"
       />
       <svg
         class="text-green-700 ml-1 h-6 w-6"
